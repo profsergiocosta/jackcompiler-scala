@@ -1,3 +1,6 @@
+
+package JackCompiler
+
 import scala.io.Source
 import scala.util.matching.Regex
 import scala.collection.mutable.Stack
