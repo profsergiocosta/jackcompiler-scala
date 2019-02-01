@@ -30,6 +30,7 @@ class JackTokenizer (val fName:String) {
     private def isIntConst(s:String)=  s.matches("[0-9]+")
 
     def advance ()  = currToken = tokens.next
+    
     def hasMoreTokens () = tokens.hasNext
     def getToken() :Token = {
        if (keywords contains currToken)     TKeyword(currToken)
