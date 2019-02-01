@@ -28,6 +28,7 @@ class CompilationEngine (val fName:String) {
       nextToken
       s+=compileExpression()
       s+= untagNonTerminal("letStatement")
+      s+=expected(";")
       s
     }
     def compileExpression() :String = {
