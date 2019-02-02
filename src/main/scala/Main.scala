@@ -6,7 +6,7 @@ import java.io._
 
 class JackCompiler {
   
-  val comp = new CompilationEngine ("MainS.jack")
+  val comp = new CompilationEngine ("Main.jack")
   try {
 
     val pw = new PrintWriter(new File("Main.xml" ))
@@ -22,7 +22,6 @@ class JackCompiler {
 }
 
 
-object JackCompiler extends App{
-  
+object Main extends App{
   new JackCompiler();
 }

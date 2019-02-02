@@ -13,7 +13,7 @@ class Main {
         var SquareGame game;
         let game = 10;
         //do game.run();
-        //do game.dispose();
+        do gamedispose();
         return 20;
     }
 
@@ -22,7 +22,7 @@ class Main {
         var String s;
         var Array a;
            // There is no else keyword in the Square files.
-            let i = i;
+           let i = i;
             let j = j;
         return;
     }

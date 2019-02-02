@@ -50,6 +50,16 @@ class CompilationEngine (val fName:String) {
       nextToken
       s+=jt.tagToken        
       nextToken
+      jt.getToken match { 
+        case TSymbol ('[') => {
+            s+=expected("[");
+            nextToken();
+            s+=compileExpression();
+            s+=expected("]");
+            nextToken();
+        }
+        case _ => {}
+      }
       s+=expected("=");
       nextToken
       s+=compileExpression()
@@ -70,7 +80,6 @@ class CompilationEngine (val fName:String) {
       s+=expected("(");
       nextToken
       s += compileExpression()
-      nextToken
       s+=expected(")")
       nextToken
       s+=expected("{")
@@ -83,8 +92,8 @@ class CompilationEngine (val fName:String) {
           s+=expected("else");  
           nextToken
           s+=expected("{")
-          s += compileStatements()
           nextToken
+          s += compileStatements()
           s+=expected("}"); 
           nextToken
         }
@@ -207,17 +216,15 @@ subroutineCall: subroutineName '(' expressiontList ')'
     def compileTerm () : String = {
       var s = tagNonTerminal("term") 
       jt.getToken match {
-        case TIntConst (_) | TStringConst (_) | TKeyword (_) => {s+=jt.tagToken} 
+        case TIntConst (_) | TStringConst (_) | TKeyword (_) => {s+=jt.tagToken ; nextToken} 
 	      case TIdentifier(i) => {
-	      	val id =jt.getToken
-		      //nextToken
-		      //s+=jt.tagToken
+		      s+=jt.tagToken
+          nextToken
 	      }
         case _ => 
 
       }
       s+= untagNonTerminal("term") 
-      nextToken
       s
     }
     def compileClass () : String = {
@@ -298,7 +305,7 @@ subroutineCall: subroutineName '(' expressiontList ')'
         case TKeyword (k) => k match {
               case "constructor" | "function" | "method" => {
                 s+= jt.tagToken
-                println (jt.tagToken)
+                //println (jt.tagToken)
                 nextToken
                 s+=compileType
                 nextToken
@@ -312,7 +319,7 @@ subroutineCall: subroutineName '(' expressiontList ')'
                 s+=expected(")")
                 nextToken
                 s+=compileSubroutineBody
-                println(jt.tagToken )
+                //println(jt.tagToken )
                 s+=compileSubRoutine
               }
               case _ => ""

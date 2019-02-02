@@ -12,8 +12,8 @@ class Main {
     function void main() {
         var SquareGame game;
         let game = 10;
-        //do game.run();
-        //do game.dispose();
+        do game.run();
+        do game.dispose();
         return 20;
     }
 
@@ -24,13 +24,15 @@ class Main {
         if (i) {
             let s = i;
             let s = j;
-            let a[i] = j;
+            let a[10] = j;
         }
+        
         else {              // There is no else keyword in the Square files.
             let i = i;
             let j = j;
-            let i = i | j;
+           // let i = i | j;
         }
+        
         return;
     }
 }
