@@ -23,5 +23,12 @@ class JackCompiler {
 
 
 object Main extends App{
-  new JackCompiler();
+  //new JackCompiler();
+  val tok = new JackTokenizer ("Main.jack")
+  tok.advance
+  while (tok.hasMoreTokens) {
+    println (tok.tagToken)
+    tok.advance
+  }
+
 }
