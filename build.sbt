@@ -12,9 +12,9 @@ scalaVersion := "2.12.4"
 
 // It's possible to define many kinds of settings, such as:
 
-name := "hello-world"
-organization := "ch.epfl.scala"
-version := "1.0"
+name := "jackcompiler-scala"
+organization := "ecp.ufma.br"
+version := "0.00001"
 
 // Note, it's not required for you to define these three settings. These are
 // mostly only necessary if you intend to publish your library's binaries on a

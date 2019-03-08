@@ -33,6 +33,8 @@ class JackTokenizer (val fName:String) {
     
     def hasMoreTokens () = tokens.hasNext
     def getToken() :Token = {
+       if (currToken == "") throw new Exception ("token not initialized, execute advance method first")
+
        if (keywords contains currToken)     TKeyword(currToken)
        else if (isSymbol(currToken))         TSymbol(currToken.charAt(0))
        else if (isStringConst(currToken))    TStringConst(currToken.slice (1,currToken.length-1))
