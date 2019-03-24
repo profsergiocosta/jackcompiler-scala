@@ -18,7 +18,8 @@ class JackTokenizer (val fName:String) {
     val keywords = Set("int","class","constructor","function","method","field","static","var","char","boolean","void","true","false","null","this","let","do","if","else","while","return");
     val source = scala.io.Source.fromFile(fName)
     val s = (source.getLines mkString "\n").replaceAll("""(//.*\n)|(/\*(.|\n)*?\*/)"""," ") // remove comentarios
-    val pattern = """"[\w\s]*"|[a-zA-Z_]+[a-zA-Z0-9_]*|[0-9]+|[+|*|/|\-|{|}|(|)|\[|\]|\.|,|;|<|>|=|~]""".r
+    //val pattern = """("\w*")|[a-zA-Z_]+[a-zA-Z0-9_]*|[0-9]+|[+|*|/|\-|{|}|(|)|\[|\]|\.|,|;|<|>|=|~]""".r
+    val pattern = """(".*")|[a-zA-Z_]+[a-zA-Z0-9_]*|[0-9]+|[+|*|/|\-|{|}|(|)|\[|\]|\.|,|;|<|>|=|~]""".r
     val tokens = pattern findAllIn s
     var currToken = ""
 
@@ -50,10 +51,10 @@ class JackTokenizer (val fName:String) {
             case TIdentifier(i) =>  ("<identifier>"+i+"</identifier>")
             case TSymbol(s) =>  "<symbol>".concat (
                                             s  match {
-                                                    case '<' => "&lt"
-                                                    case '>' => "&gt"
-                                                    case '"' => "&quot"
-                                                    case '&' => "&amp"
+                                                    case '<' => "&lt;"
+                                                    case '>' => "&gt;"
+                                                    case '"' => "&quot;"
+                                                    case '&' => "&amp;"
                                                     case _   => ""+s
                                             }).concat ( "</symbol>")
             case TIntConst(i) =>  ("<intConst>"+i+"</intConst>")
