@@ -23,7 +23,10 @@ class JackCompiler {
 
 
 object Main extends App{
-  //new JackCompiler();
+  new JackCompiler();
+
+  /*
+  // apenas para escrever os tokens
   val tok = new JackTokenizer ("Main.jack")
   val pw = new PrintWriter(new File("Main.xml" ))
   tok.advance
@@ -34,4 +37,5 @@ object Main extends App{
   }
   pw.print("</tokens>")
   pw.close
+  */
 }
