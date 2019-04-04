@@ -17,6 +17,174 @@ class CompilationEngine (val fName:String) {
 			case _ => { throw new Exception ("expected: "+tk +" found: " + jt.currToken)   }
 		}
 	}
+    def compile () : String = {
+      nextToken
+      compileClass
+    }
+
+  def compileClass () : String = {
+        var s = ""
+        s+= tagNonTerminal("class")
+        s+=expected("class")
+        nextToken
+        s+=jt.tagToken // class identifier
+        nextToken
+        s+=expected("{")
+        nextToken
+        s+=compileClassVarDec
+        s+=compileSubRoutine
+        s+=expected("}")
+        s+=untagNonTerminal("class")
+        return s
+    }
+
+    def compileClassVarDec(): String = {
+      var s = ""
+      jt.getToken match {
+        case TKeyword (k) => k match {
+          case "field" | "static" => {
+            s+= tagNonTerminal("classVarDec");
+            s+= expected(k) // field and static
+            nextToken
+            s+=compileType
+            nextToken
+            s+= jt.tagToken() // identifier
+            nextToken
+            s+=compileListIdentifier
+            s+=untagNonTerminal("classVarDec")
+            nextToken
+            s+=compileClassVarDec()
+          }
+          case _ => ""
+        }
+        case _ => ""
+      }
+      return s
+    }
+    //adicional
+    def compileListIdentifier():String = {
+      var s = ""
+      jt.getToken match {
+        case TIdentifier (k) => {
+            s+=jt.tagToken
+            nextToken
+            s+=compileListIdentifier
+          } 
+        case TSymbol (',') => {
+            s+=expected(",")
+            nextToken
+            s+=compileListIdentifier
+        }  
+        case TSymbol (';') => {
+          s+=expected(";")
+        }
+        case _ => ""
+      }
+      return s
+    }
+    // adicional
+    def compileType () = {
+      jt.getToken match {
+        case TKeyword (k) => k match {
+               case "int"|"char"|"boolean"|"void" => expected(k) // todo: considerar que variaveis nao podem ser do tipo void
+               case _ =>  new Exception ("erro "+jt.tagToken())
+
+           }
+        case TIdentifier (_) => jt.tagToken()
+        case _ => "" 
+      }
+    }
+    def compileSubRoutine() :String  ={
+      var s = ""
+      jt.getToken match {
+        case TKeyword (k) => k match {
+              case "constructor" | "function" | "method" => {
+                s+= tagNonTerminal("subroutineDec");
+                s+= jt.tagToken
+                //println (jt.tagToken)
+                nextToken
+                s+=compileType
+                nextToken
+                s+=jt.tagToken // identifier
+                nextToken
+                s+=expected("(")
+                nextToken
+                s+=tagNonTerminal("parameterList")
+                s+=compileParameterList
+                s+=untagNonTerminal("parameterList")
+                s+=expected(")")
+                nextToken
+                s+=compileSubroutineBody
+                //println(jt.tagToken )
+                s+= untagNonTerminal("subroutineDec");
+                s+=compileSubRoutine
+                
+              }
+              case _ => ""
+        }
+        case _ => ""
+      }
+      return s
+    }
+    def compileParameterList():String = {
+      var s = ""
+      jt.getToken match {
+        case TSymbol (',') => {
+          s+=expected(",")
+          nextToken
+          s+=compileParameterList
+        }
+        case TIdentifier(_)| TKeyword(_) => {
+          s+=compileType
+          nextToken
+          s+=jt.tagToken // identifier
+          nextToken
+          s+=compileParameterList
+        }
+        case _ => ""
+      }
+      
+      return s
+    }
+
+    //'{' varDec* statements '}'
+    def compileSubroutineBody():String = {
+        var s = tagNonTerminal("subroutineBody");
+        s+= expected ("{")
+        nextToken
+        s+= compileVarDec
+        s+= compileStatements
+        s+= expected ("}")
+        nextToken
+        s+= untagNonTerminal("subroutineBody")
+        return s   
+    }
+
+    // varDec: 'var' type varName (',' varName)* ';'
+    def compileVarDec(): String = {
+      var s = ""
+      jt.getToken match {
+        case TKeyword (k) => k match {
+          case "var"  => {
+            s+= tagNonTerminal("varDec");
+            s+= expected(k) // field and static
+            nextToken
+            s+=compileType
+            nextToken
+            s+= jt.tagToken() // identifier
+            nextToken
+            s+=compileListIdentifier
+            s+=untagNonTerminal("varDec")
+            nextToken
+            s+=compileVarDec()
+          }
+          case _ => ""
+        }
+        case _ => ""
+      }
+      return s
+    }
+
 
     def compileStatement () : String = {
         var s = ""
@@ -38,10 +206,6 @@ class CompilationEngine (val fName:String) {
       s
     }
 
-    def compile () : String = {
-      nextToken
-      compileClass
-    }
 
 
     def compileLetStatement () : String =  {
@@ -227,166 +391,7 @@ subroutineCall: subroutineName '(' expressiontList ')'
       s+= untagNonTerminal("term") 
       s
     }
-    def compileClass () : String = {
-        var s = ""
-        s+= tagNonTerminal("class")
-        s+=expected("class")
-        nextToken
-        s+=jt.tagToken // class identifier
-        nextToken
-        s+=expected("{")
-        nextToken
-        s+=compileClassVarDec
-        s+=compileSubRoutine
-        s+=expected("}")
-        s+=untagNonTerminal("class")
-        return s
-    }
-
-    def compileClassVarDec(): String = {
-      var s = ""
-      jt.getToken match {
-        case TKeyword (k) => k match {
-          case "field" | "static" => {
-            s+= tagNonTerminal("classVarDec");
-            s+= expected(k) // field and static
-            nextToken
-            s+=compileType
-            nextToken
-            s+= jt.tagToken() // identifier
-            nextToken
-            s+=compileListIdentifier
-            s+=untagNonTerminal("classVarDec")
-            nextToken
-            s+=compileClassVarDec()
-          }
-          case _ => ""
-        }
-        case _ => ""
-      }
-      return s
-    }
-    //adicional
-    def compileListIdentifier():String = {
-      var s = ""
-      jt.getToken match {
-        case TIdentifier (k) => {
-            s+=jt.tagToken
-            nextToken
-            s+=compileListIdentifier
-          } 
-        case TSymbol (',') => {
-            s+=expected(",")
-            nextToken
-            s+=compileListIdentifier
-        }  
-        case TSymbol (';') => {
-          s+=expected(";")
-        }
-        case _ => ""
-      }
-      return s
-    }
-    // adicional
-    def compileType () = {
-      jt.getToken match {
-        case TKeyword (k) => k match {
-               case "int"|"char"|"boolean"|"void" => expected(k) // todo: considerar que variaveis nao podem ser do tipo void
-               case _ =>  new Exception ("erro "+jt.tagToken())
-
-           }
-        case TIdentifier (_) => jt.tagToken()
-        case _ => "" 
-      }
-    }
-    def compileSubRoutine() :String  ={
-      var s = ""
-      jt.getToken match {
-        case TKeyword (k) => k match {
-              case "constructor" | "function" | "method" => {
-                s+= jt.tagToken
-                //println (jt.tagToken)
-                nextToken
-                s+=compileType
-                nextToken
-                s+=jt.tagToken // identifier
-                nextToken
-                s+=expected("(")
-                nextToken
-                s+=tagNonTerminal("parameterList")
-                s+=compileParameterList
-                s+=untagNonTerminal("parameterList")
-                s+=expected(")")
-                nextToken
-                s+=compileSubroutineBody
-                //println(jt.tagToken )
-                s+=compileSubRoutine
-              }
-              case _ => ""
-        }
-        case _ => ""
-      }
-      return s
-    }
-    def compileParameterList():String = {
-      var s = ""
-      jt.getToken match {
-        case TSymbol (',') => {
-          s+=expected(",")
-          nextToken
-          s+=compileParameterList
-        }
-        case TIdentifier(_)| TKeyword(_) => {
-          s+=compileType
-          nextToken
-          s+=jt.tagToken // identifier
-          nextToken
-          s+=compileParameterList
-        }
-        case _ => ""
-      }
-      
-      return s
-    }
-
-    //'{' varDec* statements '}'
-    def compileSubroutineBody():String = {
-        var s = tagNonTerminal("subroutineBody");
-        s+= expected ("{")
-        nextToken
-        s+= compileVarDec
-        s+= compileStatements
-        s+= expected ("}")
-        nextToken
-        s+= untagNonTerminal("subroutineBody")
-        return s   
-    }
-
-    // varDec: 'var' type varName (',' varName)* ';'
-    def compileVarDec(): String = {
-      var s = ""
-      jt.getToken match {
-        case TKeyword (k) => k match {
-          case "var"  => {
-            s+= tagNonTerminal("varDec");
-            s+= expected(k) // field and static
-            nextToken
-            s+=compileType
-            nextToken
-            s+= jt.tagToken() // identifier
-            nextToken
-            s+=compileListIdentifier
-            s+=untagNonTerminal("varDec")
-            nextToken
-            s+=compileVarDec()
-          }
-          case _ => ""
-        }
-        case _ => ""
-      }
-      return s
-    }
-
+    
     // private
     def write(s:String) = println (s)
     def tagNonTerminal (s:String)= ("<" +s + ">\n")

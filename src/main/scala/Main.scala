@@ -24,6 +24,7 @@ class JackCompiler {
 
 object Main extends App{
   new JackCompiler();
+  
 
   /*
   // apenas para escrever os tokens
