@@ -16,6 +16,8 @@ class Main {
      let a = Array.new(length); // constructs the array
      
      let i = 0;
+
+     
      while (i < length) {
         let a[i] = Keyboard.readInt("Enter a number: "");
         let sum = sum + a[i];
@@ -24,6 +26,7 @@ class Main {
      
      do Output.printString("The average is ");
      do Output.printInt(sum / length);
+     
      return;
    }
 }

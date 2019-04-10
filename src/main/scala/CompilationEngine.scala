@@ -294,7 +294,6 @@ class CompilationEngine (val fName:String) {
       s+=expected("(");
       nextToken
       s += compileExpression()
-      nextToken
       s+=expected(")")
       nextToken
       s+=expected("{")
@@ -389,7 +388,9 @@ subroutineCall: subroutineName '(' expressiontList ')'
         || ch == '&' || ch == '|' || ch == '<' || ch == '>'
         || ch == '=');
 */
-        case TSymbol('+')| TSymbol('-') => {
+        case TSymbol('+') | TSymbol('-') | TSymbol('*') | TSymbol('/')
+              | TSymbol('&')  | TSymbol('|') 
+              | TSymbol('<') | TSymbol('>')| TSymbol('=') => {
           s+=jt.tagToken
           nextToken
           s+=compileTerm
