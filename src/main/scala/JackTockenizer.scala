@@ -31,6 +31,7 @@ class JackTokenizer (val fName:String) {
     private def isIntConst(s:String)=  s.matches("[0-9]+")
 
     def advance ()  = currToken = tokens.next
+    def updateCurrToken (tk:String)  = currToken = tk
     
     def hasMoreTokens () = tokens.hasNext
     def getToken() :Token = {
@@ -45,8 +46,10 @@ class JackTokenizer (val fName:String) {
 
     def getTokenAsString() = currToken
 
-    def  tagToken () : String = {
-            var s = getToken() match {
+    def  tagToken () : String = tagTokenBy(getToken()) 
+
+    def  tagTokenBy (t:Token) : String = {
+            var s = t match {
             case TKeyword(k) =>  ("<keyword>"+k+"</keyword>")
             case TIdentifier(i) =>  ("<identifier>"+i+"</identifier>")
             case TSymbol(s) =>  "<symbol>".concat (

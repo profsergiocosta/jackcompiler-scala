@@ -322,12 +322,13 @@ class CompilationEngine (val fName:String) {
 subroutineCall: subroutineName '(' expressiontList ')' 
 | (className|varName) '.' subroutineName '(' expressiontList ')'
 */
-    def compileSubroutineCall () : String =  {
-        var s = tagNonTerminal("subroutineCall")
-        s+=jt.tagToken  // subroutineName
-        nextToken
+
+  def compileSubroutineCall (id:Token) : String =  {
+         var s = tagNonTerminal("subroutineCall")
+         s+= jt.tagTokenBy (id)  // subroutineName
         jt.getToken match {
           case TSymbol ('(') => {
+            //println(jt.tagToken)
             s+=expected("(")
             nextToken
             s+= tagNonTerminal("expressionList ")
@@ -353,7 +354,14 @@ subroutineCall: subroutineName '(' expressiontList ')'
         }
          nextToken
          s += untagNonTerminal("subroutineCall")
-        s
+         s
+  }
+
+    def compileSubroutineCall () : String =  {
+         var tk = jt.getToken
+         nextToken
+         var s = compileSubroutineCall(tk)
+         s
     }
 
     // expressionList: (expression (',' expression)* )?
@@ -370,9 +378,32 @@ subroutineCall: subroutineName '(' expressiontList ')'
         s
     }
 
+
+    /// auxiliar function
+    def compileSubTerms() :String = {
+      var s = ""
+      jt.getToken match {
+         
+         /*
+         (ch == '+' || ch == '-' || ch == '*' || ch == '/'
+        || ch == '&' || ch == '|' || ch == '<' || ch == '>'
+        || ch == '=');
+*/
+        case TSymbol('+')| TSymbol('-') => {
+          s+=jt.tagToken
+          nextToken
+          s+=compileTerm
+          s+= compileSubTerms
+        }
+        case _ => ""
+      }
+      s
+    }
+
     def compileExpression() :String = {
       var s = tagNonTerminal("expression") 
       s+=compileTerm
+      s+=compileSubTerms
       s+= untagNonTerminal("expression") 
       s
     }
@@ -382,9 +413,41 @@ subroutineCall: subroutineName '(' expressiontList ')'
       jt.getToken match {
         case TIntConst (_) | TStringConst (_) | TKeyword (_) => {s+=jt.tagToken ; nextToken} 
 	      case TIdentifier(i) => {
-		      s+=jt.tagToken
+          val id = jt.getToken
           nextToken
+          jt.getToken match {
+            case TSymbol ('[') =>{
+              s+=jt.tagTokenBy(id)
+              s+=expected("[")
+              nextToken
+              s+=compileExpression
+              s+=expected("]")
+              nextToken();
+            }
+            case TSymbol ('(')|TSymbol ('.') =>{ 
+               s+= compileSubroutineCall(id);
+            }
+
+            case _ => {
+              s+=jt.tagTokenBy(id)
+            }
+            
+          }
 	      }
+        case TSymbol ('(') =>{
+            s+=jt.tagToken()
+            nextToken();
+            s+=compileExpression
+            //println(jt.tagToken)
+            s+=expected(")")
+            nextToken();
+        }
+        case TSymbol ('-')| TSymbol ('~') =>{
+            s+=jt.tagToken
+            nextToken();
+            s+= compileTerm;
+        }
+
         case _ => 
 
       }

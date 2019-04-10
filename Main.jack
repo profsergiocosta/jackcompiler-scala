@@ -23,13 +23,13 @@ class Main {
         var String s;
         var Array a;
         if (i) {
-            let s = i;
+            let s = 10+4;
             let s = j;
-            let a[i] = j;
+            let a[i] = (i);
         }
         else {              // There is no else keyword in the Square files.
-            let i = i;
-            let j = j;
+            let i = -i;
+            let j = funcao(a[4]);
             let i = i;
         }
         return;
