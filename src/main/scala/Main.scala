@@ -23,11 +23,15 @@ class JackCompiler {
 
 
 object Main extends App{
-  new JackCompiler();
+  //new JackCompiler();
+
+  val vm = new VMWriter ("teste.vm")
+  vm.writeLabel("ola");
+  vm.close()
   
 
+
   /*
-  // apenas para escrever os tokens
   val tok = new JackTokenizer ("Main.jack")
   val pw = new PrintWriter(new File("Main.xml" ))
   tok.advance
