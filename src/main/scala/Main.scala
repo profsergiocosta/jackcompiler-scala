@@ -3,11 +3,11 @@ package jackcompiler
 
 
 @main def compile: Unit = 
-  println("ola mundo")
+  println("compiling")
   
   val parser = JackParser("/home/sergio/developing/Main.jack")
-  parser.parseLetStatement()
-  println("ola mundo 2")
+  val let = parser.parseLetStatement()
+  println(let)
   
 
 def msg = "I was compiled by Scala 3. :)"

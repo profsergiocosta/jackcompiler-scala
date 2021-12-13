@@ -11,6 +11,7 @@ case class TSymbol (c:Char) extends Token
 case class TIdentifier(s:String) extends Token
 case class TStringConst(s:String) extends Token
 case class TIntConst(i:Int) extends Token
+case class TEOF (t:Char) extends Token
 
 
 class JackTokenizer (val fName:String) {
@@ -32,7 +33,8 @@ class JackTokenizer (val fName:String) {
     def hasMoreTokens () = tokens.hasNext
 
     def nextToken() :Token = {
-       advance() 
+       advance()
+
        if (currToken == "") throw new Exception ("token not initialized, execute advance method first")
 
        if (keywords contains currToken)     TKeyword(currToken)

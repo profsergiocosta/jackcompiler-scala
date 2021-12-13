@@ -16,17 +16,46 @@ class JackParser (val fName:String) {
 
     def nextToken ()  = {
         currToken = peekToken
-        peekToken = jt.nextToken()
+        if (jt.hasMoreTokens())
+            peekToken = jt.nextToken()
     }
 
-    def parseLetStatement () = {
+    def parseLetStatement () : ast.Node = {
         expectPeek(TKeyword ("let"))
-        expectPeek(TIdentifier (null))
-        val id = tokenToAST(currToken)
-        println(id)
+        val id = parseIdentifier();
+        expectPeek(TSymbol('='));
+        val exp = parseExpression()
+        val st = ast.LetStatement(id, exp)
+        println(currToken)
+        println(peekToken)
+        expectPeek(TSymbol(';'));
+        return st;
     }
 
-    def tokenToAST (tk:Token) : ast.Node = {
+    def parseIdentifier () : ast.Identifier = {
+        peekToken match {
+            case TIdentifier (varname) => {
+                nextToken()
+                return ast.Identifier(varname)
+            }
+            case _ => throw new Exception ("identifier expected")
+        }
+    }
+
+    def parseExpression()  : ast.Expression  = {
+        return parseTerm()
+    }
+
+    def parseTerm () : ast.Expression = {
+        peekToken match {
+            case TIntConst (value) => {
+                nextToken()
+                return ast.IntegerLiteral(value)
+            }
+        }
+    }
+
+    private def toast (tk:Token) : ast.Node = {
             var node = currToken match  {
                 case TIdentifier (varname) => ast.Identifier (varname)
             }
@@ -34,10 +63,10 @@ class JackParser (val fName:String) {
     }
 
    
-    def expectPeek (tk:Token)  = {
-        peekToken match {
+    private def expectPeek (tk:Token)  = {
+        tk match {
             case TIdentifier (_) => {
-                tk match {
+                peekToken match {
                     case TIdentifier (_) =>  nextToken()
                     case _ => throw new Exception ("erro")
                 }
