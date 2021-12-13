@@ -6,8 +6,11 @@ package jackcompiler
   println("compiling")
   
   val parser = JackParser("/home/sergio/developing/Main.jack")
-  val let = parser.parseLetStatement()
-  println(let)
+  val st = parser.parseStatements()
+  var visitor = new AstPrinter()
+  st.head.accept(visitor)
+  println()
+  
   
 
 def msg = "I was compiled by Scala 3. :)"

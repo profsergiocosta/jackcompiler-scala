@@ -20,23 +20,53 @@ class JackParser (val fName:String) {
             peekToken = jt.nextToken()
     }
 
-    def parseLetStatement () : ast.Node = {
+    def parseStatements () : List[ast.Statement] = {
+        if (!jt.hasMoreTokens ()) 
+            return Nil
+        else
+            return parseStatement() :: parseStatements()
+    }
+
+
+    def parseStatement () : ast.Statement = {
+        return parseLetStatement()
+    }
+
+    def parseLetStatement () : ast.LetStatement = {
         expectPeek(TKeyword ("let"))
+        
         val id = parseIdentifier();
+        
         expectPeek(TSymbol('='));
+        
         val exp = parseExpression()
         val st = ast.LetStatement(id, exp)
-        println(currToken)
-        println(peekToken)
+        
         expectPeek(TSymbol(';'));
+        
         return st;
     }
 
+
+
     def parseIdentifier () : ast.Identifier = {
-        peekToken match {
+        
+        expectPeek(TIdentifier(null))
+        
+        currToken match {
             case TIdentifier (varname) => {
-                nextToken()
-                return ast.Identifier(varname)
+                
+                peekToken match {
+                    case TSymbol ('[') =>  {
+                        nextToken()
+                        val exp = parseExpression()
+                        expectPeek(TSymbol(']'))
+                        return ast.IndexVariable(varname,exp)
+
+                    }
+                    case _ => return ast.Variable(varname)
+                }
+                
             }
             case _ => throw new Exception ("identifier expected")
         }
@@ -55,13 +85,7 @@ class JackParser (val fName:String) {
         }
     }
 
-    private def toast (tk:Token) : ast.Node = {
-            var node = currToken match  {
-                case TIdentifier (varname) => ast.Identifier (varname)
-            }
-            return node
-    }
-
+  
    
     private def expectPeek (tk:Token)  = {
         tk match {
