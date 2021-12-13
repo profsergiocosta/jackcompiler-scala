@@ -1,5 +1,5 @@
 
-package JackCompiler
+package jackcompiler
 
 import scala.io.Source
 import scala.util.matching.Regex
@@ -11,7 +11,7 @@ case class TSymbol (c:Char) extends Token
 case class TIdentifier(s:String) extends Token
 case class TStringConst(s:String) extends Token
 case class TIntConst(i:Int) extends Token
-case class TUnknow(s:String) extends Token
+
 
 class JackTokenizer (val fName:String) {
   

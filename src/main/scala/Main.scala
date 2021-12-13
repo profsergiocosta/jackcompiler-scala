@@ -1,11 +1,13 @@
-package JackCompiler
+package jackcompiler
+
+
 
 @main def compile: Unit = 
-  println("Hello world!")
-  println(msg)
-  val tokenizer = JackTokenizer("/home/sergio/developing/Main.jack")
-  while (tokenizer.hasMoreTokens()) {
-    println (tokenizer.nextToken())
-  }
+  println("ola mundo")
+  
+  val parser = JackParser("/home/sergio/developing/Main.jack")
+  parser.parseLetStatement()
+  println("ola mundo 2")
+  
 
 def msg = "I was compiled by Scala 3. :)"
