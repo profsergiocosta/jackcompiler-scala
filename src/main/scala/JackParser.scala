@@ -73,6 +73,13 @@ class JackParser (val fName:String) {
         }
     }
 
+    def createBinaryExpression (left:ast.Expression, token: Token) : ast.Expression = {
+        token match {
+            case TSymbol (op) => return ast.BinaryExpression (left, op, parseExpression())
+        }
+
+    }
+
     def parseExpression()  : ast.Expression  = {
         var exp = parseTerm()
         peekToken match {
@@ -82,7 +89,7 @@ class JackParser (val fName:String) {
                  |TSymbol ('>') | TSymbol ('<') | TSymbol ('=')
                     => {
                 nextToken()
-                return ast.BinaryExpression (exp, currToken, parseExpression())
+                return createBinaryExpression(exp, currToken)
             }
 
             case _ => return exp
