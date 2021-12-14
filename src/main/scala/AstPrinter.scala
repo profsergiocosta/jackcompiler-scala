@@ -29,7 +29,6 @@ class AstPrinter extends Visitor {
                 print (" ")
                 v.right.accept(this)
                 print (")")
-
          
         
     }

@@ -7,7 +7,8 @@ package jackcompiler
   
   val parser = JackParser("/home/sergio/developing/Main.jack")
   val st = parser.parseStatements()
-  var visitor = new AstPrinter()
+  //var visitor = new AstPrinter()
+  var visitor = VMWriter()
   st.head.accept(visitor)
   println()
   
