@@ -5,6 +5,7 @@ package jackcompiler
     
 import jackcompiler.ast as ast
 
+
     
 class JackParser (val fName:String) {
 
@@ -41,7 +42,7 @@ class JackParser (val fName:String) {
         
         val exp = parseExpression()
         val st = ast.LetStatement(id, exp)
-        
+        currToken
         expectPeek(TSymbol(';'));
         
         return st;
@@ -73,8 +74,23 @@ class JackParser (val fName:String) {
     }
 
     def parseExpression()  : ast.Expression  = {
-        return parseTerm()
+        var exp = parseTerm()
+        peekToken match {
+            case TSymbol ('+')| TSymbol ('-')
+                 |TSymbol ('*') | TSymbol ('/') 
+                 |TSymbol ('&') | TSymbol ('|')  
+                 |TSymbol ('>') | TSymbol ('<') | TSymbol ('=')
+                    => {
+                nextToken()
+                return ast.BinaryExpression (exp, currToken, parseExpression())
+            }
+
+            case _ => return exp
+            
+        }
     }
+        
+    
 
     def parseTerm () : ast.Expression = {
         peekToken match {

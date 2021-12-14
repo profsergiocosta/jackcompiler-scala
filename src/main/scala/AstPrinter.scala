@@ -22,4 +22,23 @@ class AstPrinter extends Visitor {
         print(v.value)
     }
 
+    def visitBinaryExpression (v: BinaryExpression) = {
+        v.operator match {
+
+            case TSymbol (op) => {
+                print("(" + op)
+                v.left.accept(this)
+                print (" ")
+                v.right.accept(this)
+                print (")")
+
+            }
+
+
+            case _ => {}
+        }
+    }
+
+    
+
 }

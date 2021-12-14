@@ -1,10 +1,17 @@
 package jackcompiler.ast
 
+import jackcompiler.Token
+
+
+
+
 abstract class Visitor {
     def visitLetStatement (v: LetStatement) : Unit
     def visitExpression (v: Expression) : Unit
     def visitVariable (v: Variable) : Unit
     def visitIntegerLiteral (v: IntegerLiteral) : Unit
+    def visitBinaryExpression (v: BinaryExpression) : Unit
+    
 }
 
 abstract class Node {
@@ -18,6 +25,13 @@ abstract class Expression extends Node {
 }
 abstract class Statement extends Node
 abstract class Identifier extends Expression
+
+case class BinaryExpression (val left:Expression, val operator: Token, val right: Expression ) extends jackcompiler.ast.Expression {
+    override def accept (v: Visitor) = {
+        return v.visitBinaryExpression(this)
+    }
+}
+
 case class Variable (val varName:String) extends Identifier  {
     
     override def accept (v: Visitor) = {
