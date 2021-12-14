@@ -4,7 +4,7 @@ package jackcompiler
 
     
 import jackcompiler.ast as ast
-
+import jackcompiler.TSymbol
 
     
 class JackParser (val fName:String) {
@@ -73,6 +73,31 @@ class JackParser (val fName:String) {
         }
     }
 
+ 
+
+    def isOperator (token :Token) : Boolean = {
+        token match {
+            case TSymbol ('+')| TSymbol ('-')
+                 |TSymbol ('*') | TSymbol ('/') 
+                 |TSymbol ('&') | TSymbol ('|')  
+                 |TSymbol ('>') | TSymbol ('<') | TSymbol ('=')
+                    => return true
+            case _ => false
+        }
+    }
+
+    def parseExpression()  : ast.Expression  = {
+        var exp = parseTerm()
+        while (isOperator (peekToken) ) {
+            nextToken()
+            val op = currToken match { case TSymbol (op) => op} // ??
+            exp = ast.BinaryExpression (exp, op, parseTerm())
+        }
+        return exp
+    }
+
+    /* 
+    // right associative
     def createBinaryExpression (left:ast.Expression, token: Token) : ast.Expression = {
         token match {
             case TSymbol (op) => return ast.BinaryExpression (left, op, parseExpression())
@@ -80,7 +105,7 @@ class JackParser (val fName:String) {
 
     }
 
-    def parseExpression()  : ast.Expression  = {
+    def parseExpression_()  : ast.Expression  = {
         var exp = parseTerm()
         peekToken match {
             case TSymbol ('+')| TSymbol ('-')
@@ -96,7 +121,7 @@ class JackParser (val fName:String) {
             
         }
     }
-        
+      */  
     
 
     def parseTerm () : ast.Expression = {
