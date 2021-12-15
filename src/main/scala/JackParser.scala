@@ -22,7 +22,7 @@ class JackParser (val fName:String) {
     }
 
     def parseStatements () : List[ast.Statement] = {
-        if (!jt.hasMoreTokens ()) 
+        if (!jt.hasMoreTokens () || !isStatement (peekToken) ) 
             return Nil
         else
             return parseStatement() :: parseStatements()
@@ -30,7 +30,19 @@ class JackParser (val fName:String) {
 
 
     def parseStatement () : ast.Statement = {
-        return parseLetStatement()
+    
+        peekToken match {
+            case TKeyword("let") => {
+                return    parseLetStatement()
+            }
+            case TKeyword("if") => {
+                return    parseIfStatement()
+            }
+
+
+        }
+
+       
     }
 
     def parseLetStatement () : ast.LetStatement = {
@@ -42,10 +54,34 @@ class JackParser (val fName:String) {
         
         val exp = parseExpression()
         val st = ast.LetStatement(id, exp)
-        currToken
+
         expectPeek(TSymbol(';'));
         
         return st;
+    }
+
+    def parseIfStatement () : ast.IfStatement = {
+        expectPeek(TKeyword ("if"))
+        expectPeek(TSymbol ('('))
+        var cond = parseExpression()
+        expectPeek(TSymbol (')'))
+        expectPeek(TSymbol ('{'))
+        var thenSts = parseStatements()
+        expectPeek(TSymbol ('}'))
+        peekToken match {    
+            case TKeyword("else") => {
+                expectPeek(TKeyword("else"))
+                expectPeek(TSymbol ('{'))
+                var elseSts = parseStatements()
+                expectPeek(TSymbol ('}'))
+                return ast.IfStatement(cond, ast.Statements(thenSts), Some(ast.Statements(elseSts)))        
+            }
+
+            case _ => return ast.IfStatement(cond, ast.Statements(thenSts))        
+
+        }
+        
+
     }
 
 
@@ -73,18 +109,6 @@ class JackParser (val fName:String) {
         }
     }
 
- 
-
-    def isOperator (token :Token) : Boolean = {
-        token match {
-            case TSymbol ('+')| TSymbol ('-')
-                 |TSymbol ('*') | TSymbol ('/') 
-                 |TSymbol ('&') | TSymbol ('|')  
-                 |TSymbol ('>') | TSymbol ('<') | TSymbol ('=')
-                    => return true
-            case _ => false
-        }
-    }
 
     def parseExpression()  : ast.Expression  = {
         var exp = parseTerm()
@@ -132,6 +156,30 @@ class JackParser (val fName:String) {
                     }
                 }
             }
-        }  
+        
+    }
+
+     
+
+    def isOperator (token :Token) : Boolean = {
+        token match {
+            case TSymbol ('+')| TSymbol ('-')
+                 |TSymbol ('*') | TSymbol ('/') 
+                 |TSymbol ('&') | TSymbol ('|')  
+                 |TSymbol ('>') | TSymbol ('<') | TSymbol ('=')
+                    => return true
+            case _ => false
+        }
+    }
+
+    def isStatement (token :Token) : Boolean = {
+        token match {
+            case TKeyword ("if")| TKeyword ("let")
+                 |TKeyword ("while") | TKeyword ("do") |TKeyword ("return")
+                    => return true
+            case _ => false
+        }
+    }
+  
   
 }

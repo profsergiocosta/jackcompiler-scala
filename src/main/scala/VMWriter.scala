@@ -37,6 +37,13 @@ class VMWriter extends ast.Visitor {
         println(vmOperator(v.operator))
     }
 
+    def visitStatements (v: Statements) = {
+        
+    }
+
+    def visitIfStatement (v: IfStatement)  = {
+        
+    }
 
     def vmOperator (c:Char) : String = {
         c match {
@@ -47,4 +54,5 @@ class VMWriter extends ast.Visitor {
         
     }    
 
+    
 }
