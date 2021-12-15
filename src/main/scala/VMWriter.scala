@@ -49,6 +49,10 @@ class VMWriter extends ast.Visitor {
     def visitWhileStatement (v: WhileStatement)  = {
         
     }
+    
+    def visitReturnStatement (v: ReturnStatement) = {
+
+    }
 
     def vmOperator (c:Char) : String = {
         c match {

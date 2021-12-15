@@ -5,6 +5,7 @@ package jackcompiler
     
 import jackcompiler.ast as ast
 import jackcompiler.TSymbol
+import jackcompiler.ast.ReturnStatement
 
     
 class JackParser (val fName:String) {
@@ -42,6 +43,11 @@ class JackParser (val fName:String) {
             case TKeyword("while") => {
                 return    parseWhileStatement()
             }
+
+            case TKeyword("return") => {
+               return    parseReturnStatement()
+            }
+
 
 
         }
@@ -96,6 +102,18 @@ class JackParser (val fName:String) {
         expectPeek(TSymbol ('}'))
         return ast.WhileStatement(cond, ast.Statements(body))        
 
+    }
+
+    def parseReturnStatement () : ast.ReturnStatement = {
+        expectPeek(TKeyword ("return"))
+       
+        var stmt = peekToken match {
+            case TSymbol (';') => ReturnStatement ()
+            case _ => ReturnStatement (Some (parseExpression()))
+        }
+        expectPeek(TSymbol (';'))
+        return stmt
+      
     }
 
 

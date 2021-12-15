@@ -58,6 +58,16 @@ class AstPrinter extends Visitor {
         print (" ) ")
     }
 
+    def visitReturnStatement (v: ReturnStatement) = {
+
+
+        print ("(return ")
+        
+        for (exp <- v.value) exp.accept(this) 
+
+        print (" ) ")
+
+    }
 
 
     def visitBinaryExpression (v: BinaryExpression) = {
