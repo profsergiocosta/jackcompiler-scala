@@ -16,6 +16,7 @@ val binOperators = Map (
 class VMWriter extends ast.Visitor {
     def visitLetStatement (v: LetStatement) = {
         v.exp.accept(this)
+        println("pop " +  v.id)
     }
     def visitExpression (v: Expression) = {
 

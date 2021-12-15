@@ -96,39 +96,20 @@ class JackParser (val fName:String) {
         return exp
     }
 
-    /* 
-    // right associative
-    def createBinaryExpression (left:ast.Expression, token: Token) : ast.Expression = {
-        token match {
-            case TSymbol (op) => return ast.BinaryExpression (left, op, parseExpression())
-        }
-
-    }
-
-    def parseExpression_()  : ast.Expression  = {
-        var exp = parseTerm()
-        peekToken match {
-            case TSymbol ('+')| TSymbol ('-')
-                 |TSymbol ('*') | TSymbol ('/') 
-                 |TSymbol ('&') | TSymbol ('|')  
-                 |TSymbol ('>') | TSymbol ('<') | TSymbol ('=')
-                    => {
-                nextToken()
-                return createBinaryExpression(exp, currToken)
-            }
-
-            case _ => return exp
-            
-        }
-    }
-      */  
-    
+        
 
     def parseTerm () : ast.Expression = {
         peekToken match {
             case TIntConst (value) => {
                 nextToken()
                 return ast.IntegerLiteral(value)
+            }
+
+            case TSymbol('(') => {
+                expectPeek(TSymbol('(')) // avançar
+                var exp = parseExpression()
+                expectPeek(TSymbol(')')) // avançar 
+                return exp
             }
         }
     }
