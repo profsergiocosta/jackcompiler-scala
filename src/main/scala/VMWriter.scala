@@ -38,10 +38,15 @@ class VMWriter extends ast.Visitor {
     }
 
     def visitStatements (v: Statements) = {
-        
+
     }
 
     def visitIfStatement (v: IfStatement)  = {
+        
+    }
+
+
+    def visitWhileStatement (v: WhileStatement)  = {
         
     }
 

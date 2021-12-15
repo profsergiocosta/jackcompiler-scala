@@ -10,6 +10,7 @@ abstract class Visitor {
     def visitStatements (v: Statements) : Unit
     def visitLetStatement (v: LetStatement) : Unit
     def visitIfStatement (v: IfStatement) : Unit
+    def visitWhileStatement (v: WhileStatement) : Unit
     
     def visitExpression (v: Expression) : Unit
     def visitVariable (v: Variable) : Unit
@@ -72,6 +73,13 @@ case class LetStatement (val id:Identifier, val exp:Expression) extends Statemen
 case class IfStatement (val condition:Expression, val thenBranch: Statements, val elseBranch:Option[Statements]=None) extends Statement{
     def accept (v: Visitor) = {
         return v.visitIfStatement(this)
+    }
+}
+
+
+case class WhileStatement (val condition:Expression, val body: Statements) extends Statement{
+    def accept (v: Visitor) = {
+        return v.visitWhileStatement(this)
     }
 }
 

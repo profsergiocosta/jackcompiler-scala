@@ -39,6 +39,10 @@ class JackParser (val fName:String) {
                 return    parseIfStatement()
             }
 
+            case TKeyword("while") => {
+                return    parseWhileStatement()
+            }
+
 
         }
 
@@ -80,7 +84,17 @@ class JackParser (val fName:String) {
             case _ => return ast.IfStatement(cond, ast.Statements(thenSts))        
 
         }
-        
+    }
+
+    def parseWhileStatement () : ast.WhileStatement = {
+        expectPeek(TKeyword ("while"))
+        expectPeek(TSymbol ('('))
+        var cond = parseExpression()
+        expectPeek(TSymbol (')'))
+        expectPeek(TSymbol ('{'))
+        var body = parseStatements()
+        expectPeek(TSymbol ('}'))
+        return ast.WhileStatement(cond, ast.Statements(body))        
 
     }
 

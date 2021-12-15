@@ -23,26 +23,41 @@ class AstPrinter extends Visitor {
     }
 
     def visitStatements (v: Statements) = {
-        print (") ")
+        print ("( ")
 
         for (st <- v.sts) st.accept(this) 
-        
-        print ("(")
+
+        print (")")
     }
 
     def visitIfStatement (v: IfStatement)  = {
         print ("(if ")
 
-        print ("(")
+       
         v.condition.accept(this)
-        print (") ")
-
+       
         v.thenBranch.accept(this)
 
+        for (st <- v.elseBranch) st.accept(this) // else is a option
 
-        print (") ")
-        
+        print (" ) ")
+
+
     }
+
+
+    def visitWhileStatement (v: WhileStatement)  = {
+        
+        print ("(while ")
+
+       
+        v.condition.accept(this)
+       
+        v.body.accept(this)
+
+        print (" ) ")
+    }
+
 
 
     def visitBinaryExpression (v: BinaryExpression) = {
