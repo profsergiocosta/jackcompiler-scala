@@ -6,6 +6,8 @@ package jackcompiler
 import jackcompiler.ast as ast
 import jackcompiler.TSymbol
 import jackcompiler.ast.ReturnStatement
+import java.security.Identity
+import scala.annotation.varargs
 
     
 class JackParser (val fName:String) {
@@ -102,6 +104,59 @@ class JackParser (val fName:String) {
         expectPeek(TSymbol ('}'))
         return ast.WhileStatement(cond, ast.Statements(body))        
 
+    }
+
+    def parseClassVarDec () : List[ast.VarDeclaration] = {
+        peekToken match {
+            case TKeyword (k)  => k match {
+                case "field" | "static" => {
+                    nextToken()
+                    var t = parseType()
+                    parseListVarDeclaration(k,t) ++ parseClassVarDec()
+                } 
+                case _ => List.empty[ast.VarDeclaration]
+            }
+            case _ => List.empty[ast.VarDeclaration]
+        }
+    }
+
+
+    def parseListVarDeclaration(kind: String, varType: String) : List[ast.VarDeclaration] = {
+      
+      peekToken match {
+        case TIdentifier (name) => {
+              nextToken()
+              ast.VarDeclaration(kind, varType , name) :: parseListVarDeclaration(kind, varType)
+          } 
+          case TSymbol (',') => {
+            nextToken()
+            parseListVarDeclaration(kind, varType)
+         }  
+         case TSymbol (';') => {
+            nextToken()
+            Nil
+         }
+               
+        case _ =>  throw Exception ("erro: identifier expected")
+      }
+      
+    }
+
+    def parseType () : String = {
+        peekToken match {
+            case TKeyword (k) => k match {
+                case "int"|"char"|"boolean"|"void" =>  {
+                    nextToken()
+                    return k
+                }
+                case _ =>  throw Exception ("erro: type expected")
+            }
+            case TIdentifier (varType) =>  {
+                nextToken()
+                return varType
+            }
+            case _ => throw Exception ("erro: type expected")
+      }
     }
 
     def parseReturnStatement () : ast.ReturnStatement = {

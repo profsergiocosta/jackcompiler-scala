@@ -35,6 +35,12 @@ abstract class Expression extends Node {
 abstract class Statement extends Node
 abstract class Identifier extends Expression
 
+case class VarDeclaration (val kind :String, val varType :String, val name :String  ) extends Node {
+     def accept (v: Visitor) = {
+    
+    }
+}
+
 case class BinaryExpression (val left:Expression, val operator: Char, val right: Expression ) extends jackcompiler.ast.Expression {
     override def accept (v: Visitor) = {
         return v.visitBinaryExpression(this)

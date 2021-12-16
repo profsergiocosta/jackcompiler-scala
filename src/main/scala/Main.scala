@@ -6,11 +6,11 @@ package jackcompiler
   println("compiling")
   
   val parser = JackParser("/home/sergio/developing/Main.jack")
-  val st = parser.parseStatements()
+  val st = parser.parseClassVarDec()
   var visitor = new AstPrinter()
   //var visitor = VMWriter()
-  println(st.head)
-  st.head.accept(visitor)
+  println(st)
+  //st.head.accept(visitor)
   println()
   
   
