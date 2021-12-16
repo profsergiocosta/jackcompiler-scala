@@ -112,11 +112,13 @@ class JackParser (val fName:String) {
                 case "field" | "static" => {
                     nextToken()
                     var t = parseType()
-                    parseListVarDeclaration(k,t) ++ parseClassVarDec()
+                    var vardec = parseListVarDeclaration(k,t) ++ parseClassVarDec()
+                    return vardec
+
                 } 
-                case _ => List.empty[ast.VarDeclaration]
+                case _ => Nil
             }
-            case _ => List.empty[ast.VarDeclaration]
+            case _ => Nil
         }
     }
 
@@ -126,17 +128,16 @@ class JackParser (val fName:String) {
       peekToken match {
         case TIdentifier (name) => {
               nextToken()
-              ast.VarDeclaration(kind, varType , name) :: parseListVarDeclaration(kind, varType)
+              var vardec = ast.VarDeclaration(kind, varType , name)
+              if (peekToken == TSymbol (',') ) {
+                  nextToken()
+                  return vardec :: parseListVarDeclaration(kind, varType)
+              } else {
+                  expectPeek(TSymbol(';'))
+                  return vardec :: Nil
+              }
           } 
-          case TSymbol (',') => {
-            nextToken()
-            parseListVarDeclaration(kind, varType)
-         }  
-         case TSymbol (';') => {
-            nextToken()
-            Nil
-         }
-               
+                  
         case _ =>  throw Exception ("erro: identifier expected")
       }
       
