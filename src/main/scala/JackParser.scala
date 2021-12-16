@@ -24,6 +24,15 @@ class JackParser (val fName:String) {
             peekToken = jt.nextToken()
     }
 
+    def parseClass () = {
+        expectPeek(TKeyword("class"));
+        expectPeek(TIdentifier(null)); // nao importa ainda o nome do identificador
+        expectPeek(TSymbol('{'));
+        parseClassVarDec()
+        parseSubroutineDec()
+        expectPeek(TSymbol('}'));
+    }
+
     def parseStatements () : List[ast.Statement] = {
         if (!jt.hasMoreTokens () || !isStatement (peekToken) ) 
             return Nil
@@ -177,10 +186,12 @@ class JackParser (val fName:String) {
                     expectPeek(TSymbol('('))
                     expectPeek(TSymbol(')'))
                     parseSubroutineBody()
-
                 }
 
+                case _ => {}
+
             }
+            case _ => {}
         }
     }
 
