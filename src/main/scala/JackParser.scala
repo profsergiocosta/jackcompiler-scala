@@ -106,6 +106,21 @@ class JackParser (val fName:String) {
 
     }
 
+
+    def parseVarDec () : List[ast.VarDeclaration] = {
+        peekToken match {
+            case TKeyword ("var") => {
+                    nextToken()
+                    var t = parseType()
+                    var vardec = parseListVarDeclaration("var",t) ++ parseVarDec()
+                    return vardec
+
+                } 
+                case _ => Nil
+            }
+    }
+    
+
     def parseClassVarDec () : List[ast.VarDeclaration] = {
         peekToken match {
             case TKeyword (k)  => k match {
@@ -141,6 +156,32 @@ class JackParser (val fName:String) {
         case _ =>  throw Exception ("erro: identifier expected")
       }
       
+    }
+
+    def parseSubroutineBody () = {
+        expectPeek(TSymbol('{'))
+        parseVarDec()
+        parseStatements()
+        expectPeek(TSymbol('}'))
+    }
+
+    def parseSubroutineDec()  = {
+        peekToken match {
+            case TKeyword (k) => k match {
+
+                case "constructor"| "function"| "method" => {
+                    nextToken()
+                    parseType()
+                    expectPeek(TIdentifier(null))
+                    var varname = currToken match { case TIdentifier (v) => v}
+                    expectPeek(TSymbol('('))
+                    expectPeek(TSymbol(')'))
+                    parseSubroutineBody()
+
+                }
+
+            }
+        }
     }
 
     def parseType () : String = {
