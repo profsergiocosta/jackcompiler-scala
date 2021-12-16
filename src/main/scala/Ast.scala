@@ -32,8 +32,27 @@ abstract class Expression extends Node {
         return v.visitExpression(this)
     }
 }
+
 abstract class Statement extends Node
 abstract class Identifier extends Expression
+
+case class ClassDec (name: String, classVardecs :List[ClassVardecs], subroutineDecs :List[Subroutinedecs]) extends Node {
+    def accept (v: Visitor) = {
+
+    }
+}
+
+case class ClassVardecs () extends Node {
+    def accept (v: Visitor) = {
+
+    }
+}
+
+case class Subroutinedecs () extends Node {
+    def accept (v: Visitor) = {
+
+    }
+}
 
 case class VarDeclaration (val kind :String, val varType :String, val name :String  ) extends Node {
      def accept (v: Visitor) = {
