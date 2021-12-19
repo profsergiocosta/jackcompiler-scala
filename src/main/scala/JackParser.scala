@@ -24,13 +24,15 @@ class JackParser (val fName:String) {
             peekToken = jt.nextToken()
     }
 
-    def parseClass () = {
+    def parseClass () : ast.ClassDec = {
         expectPeek(TKeyword("class"));
         expectPeek(TIdentifier(null)); // nao importa ainda o nome do identificador
+        var classname = currToken match { case TIdentifier (v) => v}
         expectPeek(TSymbol('{'));
-        parseClassVarDec()
-        parseSubroutineDec()
+        var vardecs = parseClassVarDec()
+        var subs = parseSubroutineDec()
         expectPeek(TSymbol('}'));
+        return ast.ClassDec (classname,vardecs, subs)
     }
 
     def parseStatements () : List[ast.Statement] = {
@@ -167,31 +169,33 @@ class JackParser (val fName:String) {
       
     }
 
-    def parseSubroutineBody () = {
+    def parseSubroutineBody () : ast.SubroutineBody = {
         expectPeek(TSymbol('{'))
-        parseVarDec()
-        parseStatements()
+        var vardecs = parseVarDec()
+        var sts = parseStatements()
         expectPeek(TSymbol('}'))
+        return ast.SubroutineBody(vardecs , ast.Statements(sts))
     }
 
-    def parseSubroutineDec()  = {
+    def parseSubroutineDec() : List[ast.Subroutine]  = {
         peekToken match {
             case TKeyword (k) => k match {
 
                 case "constructor"| "function"| "method" => {
                     nextToken()
-                    parseType()
+                    var ftype = parseType()
                     expectPeek(TIdentifier(null))
-                    var varname = currToken match { case TIdentifier (v) => v}
+                    var fname = currToken match { case TIdentifier (v) => v}
                     expectPeek(TSymbol('('))
                     expectPeek(TSymbol(')'))
-                    parseSubroutineBody()
+                    var body = parseSubroutineBody()
+                    return  ast.Subroutine (k, ftype , fname, body) :: parseSubroutineDec()
                 }
 
-                case _ => {}
+                case _ => Nil
 
             }
-            case _ => {}
+            case _ => Nil
         }
     }
 

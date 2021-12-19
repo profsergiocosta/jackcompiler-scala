@@ -36,7 +36,7 @@ abstract class Expression extends Node {
 abstract class Statement extends Node
 abstract class Identifier extends Expression
 
-case class ClassDec (name: String, classVardecs :List[ClassVardecs], subroutineDecs :List[Subroutinedecs]) extends Node {
+case class ClassDec (name: String, classVardecs :List[VarDeclaration], subroutineDecs :List[Subroutine]) extends Node {
     def accept (v: Visitor) = {
 
     }
@@ -48,11 +48,18 @@ case class ClassVardecs () extends Node {
     }
 }
 
-case class Subroutinedecs () extends Node {
+case class Subroutine (modifier:String, funcType:String, name: String, body: SubroutineBody) extends Node {
     def accept (v: Visitor) = {
 
     }
 }
+
+case class SubroutineBody (vardecs:List[VarDeclaration], statements:Statements) extends Node {
+    def accept (v: Visitor) = {
+
+    }
+}
+
 
 case class VarDeclaration (val kind :String, val varType :String, val name :String  ) extends Node {
      def accept (v: Visitor) = {

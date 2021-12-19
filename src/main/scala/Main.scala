@@ -7,10 +7,10 @@ package jackcompiler
   
   val parser = JackParser("/home/sergio/developing/Main.jack")
   //val st = parser.parseClassVarDec()
-  parser.parseSubroutineDec()
+  val st = parser.parseClass()
   //var visitor = new AstPrinter()
   //var visitor = VMWriter()
-  //println(st)
+  println(st)
   //st.head.accept(visitor)
   println()
   
