@@ -160,6 +160,17 @@ class JackParser (val fName:String) {
         }
     }
 
+    def parseParameterList() : Unit = {
+        if (peekTokenIs(TSymbol(')'))) return
+
+        var t = parseType()
+        expectPeek(TIdentifier(null))
+        if (peekTokenIs(TSymbol(','))) {
+            expectPeek(TSymbol(','))
+            parseParameterList()
+        }
+    }
+
 
     def parseListVarDeclaration(kind: String, varType: String) : Unit = {
       
@@ -198,6 +209,7 @@ class JackParser (val fName:String) {
                     expectPeek(TIdentifier(null))
                     var fname = currToken match { case TIdentifier (v) => v}
                     expectPeek(TSymbol('('))
+                    parseParameterList()
                     expectPeek(TSymbol(')'))
                     var body = parseSubroutineBody()
                     return  ast.Subroutine (k, ftype , fname, body) :: parseSubroutineDec()
@@ -289,6 +301,7 @@ class JackParser (val fName:String) {
         expectPeek(TSymbol('.'))
         expectPeek(TIdentifier(null))
         var fname = currToken match { case TIdentifier(i) => i} 
+        expectPeek(TSymbol('('))
         var args = parseExpressionList()
         expectPeek(TSymbol(')'))
         return ast.Call(fname,args)
@@ -312,11 +325,12 @@ class JackParser (val fName:String) {
     }
 
     def parseTerm () : ast.Expression = {
+        
         peekToken match {
 
             case TKeyword (tk) => {
                 tk match {
-                    case "false"| "true" | "null" => {
+                    case "false"| "true" | "null" |"this" => {
                         nextToken()
                         return ast.KeywordLiteral(tk)
                     }
@@ -358,6 +372,10 @@ class JackParser (val fName:String) {
                         nextToken()
                         var exp = parseTerm()
                         return ast.UnaryExpression(op, exp)
+                    }
+
+                    case _ => {
+                        throw new Exception ("sintax error "+op + currToken) 
                     }
 
                 }

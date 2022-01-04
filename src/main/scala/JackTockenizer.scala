@@ -13,7 +13,7 @@ class JackTokenizer (val fName:String) {
     val keywords = Set("int","class","constructor","function","method","field","static","var","char","boolean","void","true","false","null","this","let","do","if","else","while","return");
     val source = scala.io.Source.fromFile(fName)
     val s = (source.getLines mkString "\n").replaceAll("""(//.*\n)|(/\*(.|\n)*?\*/)"""," ") // remove comentarios
-    val pattern = """(".*")|[a-zA-Z_]+[a-zA-Z0-9_]*|[0-9]+|[+|*|/|\-|{|}|(|)|\[|\]|\.|,|;|<|>|=|~]""".r
+    val pattern = """(".*")|[a-zA-Z_]+[a-zA-Z0-9_]*|[0-9]+|[+|*|/|\-|{|}|(|)|\[|\]|\.|,|;|<|>|=|~|&]""".r
     val tokens = pattern findAllIn s
     var currToken = ""
 
