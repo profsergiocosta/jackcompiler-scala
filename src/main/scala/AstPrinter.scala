@@ -14,6 +14,11 @@ class AstPrinter extends Visitor {
 
     }
 
+        def visitDoStatement (v: DoStatement) = {
+        
+    }
+
+
     def visitVariable (v: Variable) = {
         print(v.varName)
     }
@@ -80,6 +85,26 @@ class AstPrinter extends Visitor {
          
         
     }
+
+     def visitUnaryExpression (v: UnaryExpression) = {
+     
+                print("(" + v.operator)
+                print (" ")
+                v.right.accept(this)
+                print (")")
+     }
+
+     def visitCall (v: Call) = {
+        
+    }
+
+
+     def visitKeywordLiteral (v: KeywordLiteral) = {
+         print ("Keyword(")
+         print(v.value)   
+         print (")")
+     }
+
 
     
 

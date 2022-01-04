@@ -12,11 +12,18 @@ abstract class Visitor {
     def visitIfStatement (v: IfStatement) : Unit
     def visitWhileStatement (v: WhileStatement) : Unit
     def visitReturnStatement (v: ReturnStatement) : Unit
-    
+    def visitDoStatement (v: DoStatement) : Unit
+
+
+
     def visitExpression (v: Expression) : Unit
     def visitVariable (v: Variable) : Unit
     def visitIntegerLiteral (v: IntegerLiteral) : Unit
+    def visitKeywordLiteral (v: KeywordLiteral) : Unit
     def visitBinaryExpression (v: BinaryExpression) : Unit
+    def visitUnaryExpression (v: UnaryExpression) : Unit
+    def visitCall (v: Call) : Unit
+    
     
 
     
@@ -64,6 +71,13 @@ case class BinaryExpression (val left:Expression, val operator: Char, val right:
     }
 }
 
+
+case class UnaryExpression (val operator: Char, val right: Expression ) extends jackcompiler.ast.Expression {
+    override def accept (v: Visitor) = {
+        return v.visitUnaryExpression(this)
+    }
+}
+
 case class Variable (val varName:String) extends Identifier  {
     
     override def accept (v: Visitor) = {
@@ -76,6 +90,22 @@ case class IntegerLiteral (val value:Int) extends Expression  {
 
     override def accept (v: Visitor) = {
         return v.visitIntegerLiteral(this)
+    }
+
+}
+
+case class KeywordLiteral (val value:String) extends Expression  {
+
+    override def accept (v: Visitor) = {
+        return v.visitKeywordLiteral(this)
+    }
+
+}
+
+case class Call (val name:String, arguments:List[Expression]) extends Expression  {
+
+    override def accept (v: Visitor) = {
+        return v.visitCall(this)
     }
 
 }
@@ -111,6 +141,13 @@ case class WhileStatement (val condition:Expression, val body: Statements) exten
 case class ReturnStatement (val value:Option[Expression]=None) extends Statement{
     def accept (v: Visitor) = {
         return v.visitReturnStatement(this)
+    }
+}
+
+
+case class DoStatement (val subroutine:Expression) extends Statement{
+    def accept (v: Visitor) = {
+        return v.visitDoStatement(this)
     }
 }
 

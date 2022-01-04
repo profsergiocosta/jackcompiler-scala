@@ -22,6 +22,10 @@ class VMWriter extends ast.Visitor {
 
     }
 
+    def visitDoStatement (v: DoStatement) = {
+        
+    }
+
     def visitVariable (v: Variable) = {
         //print(v.varName)
     }
@@ -36,6 +40,19 @@ class VMWriter extends ast.Visitor {
         v.right.accept(this)
         println(vmOperator(v.operator))
     }
+
+    def visitUnaryExpression (v: UnaryExpression) = {
+
+ 
+    }
+
+    def visitCall (v: Call) = {
+
+    }
+
+    def visitKeywordLiteral (v: KeywordLiteral) = {
+         
+     }
 
     def visitStatements (v: Statements) = {
 

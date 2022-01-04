@@ -62,10 +62,23 @@ class JackParser (val fName:String) {
             }
 
 
+            case TKeyword("do") => {
+               return    parseDoStatement()
+            }
+
+
 
         }
 
        
+    }
+
+    def parseDoStatement () : ast.DoStatement = {
+        expectPeek(TKeyword ("do"))
+        expectPeek(TIdentifier (null))
+        var call = parseSubroutineCall()
+        expectPeek(TSymbol(';'));
+        return ast.DoStatement(call)
     }
 
     def parseLetStatement () : ast.LetStatement = {
@@ -262,10 +275,55 @@ class JackParser (val fName:String) {
         return exp
     }
 
+
         
+    def parseSubroutineCall () : ast.Expression = {
+      var id = currToken match { case TIdentifier(i) => i}  
+      
+      if (peekTokenIs(TSymbol('(')) ) {
+        expectPeek(TSymbol('('))
+        var args = parseExpressionList()
+        expectPeek(TSymbol(')'))
+        return ast.Call(id,args)
+      } else {
+        expectPeek(TSymbol('.'))
+        expectPeek(TIdentifier(null))
+        var fname = currToken match { case TIdentifier(i) => i} 
+        var args = parseExpressionList()
+        expectPeek(TSymbol(')'))
+        return ast.Call(fname,args)
+      }
+
+    }
+
+
+    def parseExpressionList () : List[ast.Expression] = {
+        if (peekTokenIs(TSymbol(')'))) {
+            return List.empty
+        }else {
+            var exp = parseExpression()  
+            if (peekTokenIs(TSymbol(','))) {
+                expectPeek(TSymbol(','))
+                return exp :: parseExpressionList()
+            } else {
+                return exp :: parseExpressionList()
+            }
+        }
+    }
 
     def parseTerm () : ast.Expression = {
         peekToken match {
+
+            case TKeyword (tk) => {
+                tk match {
+                    case "false"| "true" | "null" => {
+                        nextToken()
+                        return ast.KeywordLiteral(tk)
+                    }
+                    case _ => throw new Exception ("sintax error")
+                }
+            }
+
             case TIntConst (value) => {
                 nextToken()
                 return ast.IntegerLiteral(value)
@@ -273,7 +331,9 @@ class JackParser (val fName:String) {
 
             case TIdentifier(id) => {
                 nextToken();
-                if (peekTokenIs(TSymbol('['))){
+                if (peekTokenIs(TSymbol('(')) || peekTokenIs(TSymbol('.')) ) {
+                    return parseSubroutineCall()
+                } else if (peekTokenIs(TSymbol('['))){
                     expectPeek(TSymbol('['))
                     var exp = parseExpression()
                     expectPeek(TSymbol(']'))
@@ -285,12 +345,25 @@ class JackParser (val fName:String) {
                 
             }
 
-            case TSymbol('(') => {
-                expectPeek(TSymbol('(')) // avançar
-                var exp = parseExpression()
-                expectPeek(TSymbol(')')) // avançar 
-                return exp
+            case TSymbol(op) => {
+                op match {
+                    case '(' => {
+                        expectPeek(TSymbol('(')) // avançar
+                        var exp = parseExpression()
+                        expectPeek(TSymbol(')')) // avançar 
+                        return exp
+                    }
+
+                    case '-' | '~' => {
+                        nextToken()
+                        var exp = parseTerm()
+                        return ast.UnaryExpression(op, exp)
+                    }
+
+                }
             }
+
+
         }
     }
 
@@ -301,7 +374,7 @@ class JackParser (val fName:String) {
             case TIdentifier (_) => {
                 peekToken match {
                     case TIdentifier (_) =>  nextToken()
-                    case _ => throw new Exception ("erro")
+                    case _ => throw new Exception ("sintax error")
                 }
             }
             case _ => {
