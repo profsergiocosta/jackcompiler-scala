@@ -14,13 +14,20 @@ class AstPrinter extends Visitor {
 
     }
 
-        def visitDoStatement (v: DoStatement) = {
+
+
+    def visitDoStatement (v: DoStatement) = {
         
     }
 
 
     def visitVariable (v: Variable) = {
         print(v.varName)
+    }
+
+     def visitStringLiteral (v: StringLiteral) = {
+        
+        
     }
 
     def visitIntegerLiteral (v: IntegerLiteral) = {

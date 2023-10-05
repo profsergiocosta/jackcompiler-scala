@@ -3,11 +3,21 @@ import org.junit.Assert.*
 
 import jackcompiler.*
 
+def imprime (str:String) : Unit = {
+for (char <- str) {
+  val asciiCode = char.toInt
+  println(s"Caractere: $char | Código ASCII: $asciiCode")
+}
+
+}
 class Test1:
 
 
+  
+
+
   @Test
-  def testExpression(): Unit = {
+  def testInt(): Unit = {
     val input =
       """10
       """
@@ -23,3 +33,190 @@ class Test1:
       assertEquals(expected, actual)
   }
 
+
+  @Test
+  def testSimpleExpression1(): Unit = {
+    val input =
+      """10+20
+      """
+
+    val parser = new JackParser(input)
+    val st = parser.parseExpression()
+    var visitor = VisitWriter()
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """push constant 10
+push constant 20
+add
+"""
+      assertEquals(expected, actual)
+  }
+
+
+  @Test
+  def testSimpleExpression2(): Unit = {
+    val input =
+      """10* 20
+      """
+
+    val parser = new JackParser(input)
+    val st = parser.parseExpression()
+    var visitor = VisitWriter()
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """push constant 10
+push constant 20
+call Math.multiply 2
+"""
+      assertEquals(expected, actual)
+  }
+
+
+  @Test
+  def testString(): Unit = {
+    val input =
+      """"OLA"
+      """
+
+    val parser = new JackParser(input)
+    val st = parser.parseExpression()
+    var visitor = VisitWriter()
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """push constant 3
+call String.new 1
+push constant 79
+call String.appendChar 2
+push constant 76
+call String.appendChar 2
+push constant 65
+call String.appendChar 2
+"""
+
+      assertEquals(expected, actual)
+  }
+
+
+
+  @Test
+  def testFalse(): Unit = {
+    val input =
+      """false
+      """
+
+    val parser = new JackParser(input)
+    val st = parser.parseExpression()
+    var visitor = VisitWriter()
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """push constant 0
+"""
+      assertEquals(expected, actual)
+  }
+
+
+    @Test
+  def testTrue(): Unit = {
+    val input =
+      """true
+      """
+
+    val parser = new JackParser(input)
+    val st = parser.parseExpression()
+    var visitor = VisitWriter()
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """push constant 0
+not
+"""
+      assertEquals(expected, actual)
+  }
+
+    @Test
+  def testThis(): Unit = {
+    val input =
+      """this
+      """
+
+    val parser = new JackParser(input)
+    val st = parser.parseExpression()
+    var visitor = VisitWriter()
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """push pointer 0
+"""
+      assertEquals(expected, actual)
+  }
+
+  @Test
+  def testNeg(): Unit = {
+    val input =
+      """- 10
+      """
+
+    val parser = new JackParser(input)
+    val st = parser.parseExpression()
+    var visitor = VisitWriter()
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """push constant 10
+neg
+"""
+      assertEquals(expected, actual)
+  }
+
+
+  @Test
+  def testReturn(): Unit = {
+    val input =
+      """return;
+      """
+
+    val parser = new JackParser(input)
+    val st = parser.parseReturnStatement()
+    var visitor = VisitWriter()
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """push constant 0
+return
+"""
+      print (expected)
+      print ("atual")
+      print (actual)
+      assertEquals(expected, actual)
+  }
+
+   @Test
+  def testReturnValue(): Unit = {
+    val input =
+      """return 10+20;
+      """
+
+    val parser = new JackParser(input)
+    val st = parser.parseReturnStatement()
+    var visitor = VisitWriter()
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """push constant 10
+push constant 20
+add
+return
+"""
+
+      assertEquals(expected, actual)
+  }
+
+
+  /*      print (expected)
+      print ("atual")
+      print (actual)
+      */

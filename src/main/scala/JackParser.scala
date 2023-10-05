@@ -338,6 +338,11 @@ class JackParser (val source:String) {
                 }
             }
 
+            case TStringConst (value) => {
+                nextToken()
+                return ast.StringLiteral(value)
+            }
+
             case TIntConst (value) => {
                 nextToken()
                 return ast.IntegerLiteral(value)

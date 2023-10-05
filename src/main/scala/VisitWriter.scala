@@ -3,21 +3,18 @@ package jackcompiler
 import scala.compat.Platform.EOL
 
 import jackcompiler.ast.* 
+import jackcompiler.Segment
+import jackcompiler.Command
 
-val binOperators = Map (
-        '+' -> "add", 
-        '-' -> "sub",
-        '&' -> "and",
-        '|' -> "or",
-        '>' -> "gt",
-        '<' -> "lt",      
-        '=' -> "eq"
-)
+
 
 
 class VisitWriter extends ast.Visitor {
 
-    var vmOutput =  new StringBuilder ("")
+
+    var vmWriter = VMWriter()
+
+    def vmOutput = vmWriter.vmOutputString
 
     def visitLetStatement (v: LetStatement) = {
         v.exp.accept(this)
@@ -36,21 +33,39 @@ class VisitWriter extends ast.Visitor {
     }
 
     def visitIntegerLiteral (v: IntegerLiteral) = {
-        //vmOutput.append (s"push constant ${v.value}\r\n" )
-        vmOutput.append ("push constant %d\n".format(10) )
+        vmWriter.writePush(Segment.CONST,v.value)
+        
+    }
+
+    def visitStringLiteral (v: StringLiteral) = {
+        
+        vmWriter.writePush(Segment.CONST, v.value.size)
+        vmWriter.writeCall("String.new", 1);
+
+        v.value.foreach { caracter =>
+            vmWriter.writePush(Segment.CONST, caracter);
+            vmWriter.writeCall("String.appendChar", 2);
+        }
         
     }
 
     def visitBinaryExpression (v: BinaryExpression) = {
 
-        //v.left.accept(this)      
-        //v.right.accept(this)
-       // vmOutput.append (vmOperator(v.operator)+EOL)
+        v.left.accept(this)      
+        v.right.accept(this)
+        v.operator match {
+            case '*' => vmWriter.writeCall ("Math.multiply",2)
+            case '/' => vmWriter.writeCall ("Math.divide", 2)
+            case '+' => vmWriter.writeArithmetic(Command.ADD) 
+        }
     }
 
     def visitUnaryExpression (v: UnaryExpression) = {
-
- 
+        v.right.accept(this)
+        v.operator match {
+            case '~' => vmWriter.writeArithmetic(Command.NOT) 
+            case '-' => vmWriter.writeArithmetic(Command.NEG)         
+        }
     }
 
     def visitCall (v: Call) = {
@@ -58,6 +73,15 @@ class VisitWriter extends ast.Visitor {
     }
 
     def visitKeywordLiteral (v: KeywordLiteral) = {
+
+        v.value match {
+            case "false" | "null" => vmWriter.writePush(Segment.CONST,0)
+            case "true" => {
+                vmWriter.writePush(Segment.CONST,0)
+                vmWriter.writeArithmetic(Command.NOT)
+            }
+            case "this" => vmWriter.writePush(Segment.POINTER,0)
+        }
          
      }
 
@@ -75,17 +99,14 @@ class VisitWriter extends ast.Visitor {
     }
     
     def visitReturnStatement (v: ReturnStatement) = {
+        val exp = v.value.getOrElse(IntegerLiteral(0))
+        exp.accept(this)
+        vmWriter.writeReturn()
+
 
     }
 
-    def vmOperator (c:Char) : String = {
-        c match {
-            case '*' => "call Math.multiply 2"
-            case '/' => "call Math.divide 2"
-            case _  =>  return binOperators(c)
-        }
-        
-    }    
+
 
     
 }

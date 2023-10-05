@@ -19,6 +19,7 @@ abstract class Visitor {
     def visitExpression (v: Expression) : Unit
     def visitVariable (v: Variable) : Unit
     def visitIntegerLiteral (v: IntegerLiteral) : Unit
+    def visitStringLiteral (v: StringLiteral) : Unit
     def visitKeywordLiteral (v: KeywordLiteral) : Unit
     def visitBinaryExpression (v: BinaryExpression) : Unit
     def visitUnaryExpression (v: UnaryExpression) : Unit
@@ -90,6 +91,14 @@ case class IntegerLiteral (val value:Int) extends Expression  {
 
     override def accept (v: Visitor) = {
         return v.visitIntegerLiteral(this)
+    }
+
+}
+
+case class StringLiteral (val value:String) extends Expression  {
+
+    override def accept (v: Visitor) = {
+        return v.visitStringLiteral(this)
     }
 
 }

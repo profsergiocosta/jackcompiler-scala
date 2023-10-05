@@ -7,7 +7,7 @@ package jackcompiler
 
   //val source = scala.io.Source.fromFile("/home/sergio/developing/Main.jack")
   
-  val input = "10"  //(source.getLines mkString "\n")
+  val input = "\"ola\""  //(source.getLines mkString "\n")
 
   val parser = JackParser(input)
   //val st = parser.parseClassVarDec()
