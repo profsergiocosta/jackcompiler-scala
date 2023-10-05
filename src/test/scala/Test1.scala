@@ -12,10 +12,6 @@ for (char <- str) {
 }
 class Test1:
 
-/*
-  
-
-
   @Test
   def testInt(): Unit = {
     val input =
@@ -188,9 +184,7 @@ neg
     """push constant 0
 return
 """
-      print (expected)
-      print ("atual")
-      print (actual)
+
       assertEquals(expected, actual)
   }
 
@@ -215,7 +209,7 @@ return
       assertEquals(expected, actual)
   }
 
-  */
+ 
 
   @Test
   def testIf(): Unit = {
@@ -229,7 +223,7 @@ return
 
     val parser = new JackParser(input)
     val st = parser.parseIfStatement()
-    println (st)
+    //println (st)
     var visitor = VisitWriter()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
@@ -247,6 +241,34 @@ return
 label IF_END0
 """
       assertEquals(expected, actual)
+  }
+
+
+  @Test
+  def testWhile(): Unit = {
+    val input =
+      """while (false) {
+                return 10;
+            } 
+      """
+
+    val parser = new JackParser(input)
+    val st = parser.parseStatement()
+    println (st)
+    var visitor = VisitWriter()
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """label WHILE_EXP0
+push constant 0
+not
+if-goto WHILE_END0
+push constant 10
+return
+goto WHILE_EXP0
+label WHILE_END0
+"""
+      assertEquals(expected, expected)
   }
 
 

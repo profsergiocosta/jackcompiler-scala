@@ -122,7 +122,22 @@ class VisitWriter extends ast.Visitor {
 
 
     def visitWhileStatement (v: WhileStatement)  = {
+        var labelTrue = "WHILE_EXP" + whileLabelNum;
+        var labelFalse = "WHILE_END" + whileLabelNum;
+        whileLabelNum += 1 ;
+
+        vmWriter.writeLabel(labelTrue);
         
+        v.condition.accept(this)
+        vmWriter.writeArithmetic(Command.NOT);
+        vmWriter.writeIf(labelFalse);
+
+        v.body.accept(this)
+
+        vmWriter.writeGoto(labelTrue); // Go back to labelTrue and check condition
+        vmWriter.writeLabel(labelFalse); // Breaks out of while loop because ~(condition) is true
+
+
     }
     
     def visitReturnStatement (v: ReturnStatement) = {
