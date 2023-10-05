@@ -12,7 +12,7 @@ for (char <- str) {
 }
 class Test1:
 
-
+/*
   
 
 
@@ -212,6 +212,40 @@ add
 return
 """
 
+      assertEquals(expected, actual)
+  }
+
+  */
+
+  @Test
+  def testIf(): Unit = {
+    val input =
+      """ if (false) {
+                return 10;
+            } else {
+                return 20;
+            }
+      """
+
+    val parser = new JackParser(input)
+    val st = parser.parseIfStatement()
+    println (st)
+    var visitor = VisitWriter()
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """push constant 0
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 10
+return
+goto IF_END0
+label IF_FALSE0
+push constant 20
+return
+label IF_END0
+"""
       assertEquals(expected, actual)
   }
 

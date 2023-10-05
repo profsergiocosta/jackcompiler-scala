@@ -23,6 +23,7 @@ class VMWriter {
 
 
 
+
   import Segment._
   import Command._
 

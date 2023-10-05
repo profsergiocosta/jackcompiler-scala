@@ -14,6 +14,9 @@ class VisitWriter extends ast.Visitor {
 
     var vmWriter = VMWriter()
 
+    private var ifLabelNum = 0
+    private var whileLabelNum = 0
+
     def vmOutput = vmWriter.vmOutputString
 
     def visitLetStatement (v: LetStatement) = {
@@ -87,10 +90,34 @@ class VisitWriter extends ast.Visitor {
 
     def visitStatements (v: Statements) = {
 
+        v.sts.foreach { st =>  st.accept (this) }
+
     }
 
     def visitIfStatement (v: IfStatement)  = {
+
+        var labelTrue = "IF_TRUE" + ifLabelNum;
+        var labelFalse = "IF_FALSE" + ifLabelNum;
+        var labelEnd = "IF_END" + ifLabelNum;
+
+        ifLabelNum += 1;
+        v.condition.accept(this)
         
+        vmWriter.writeIf(labelTrue);
+        vmWriter.writeGoto(labelFalse);
+        vmWriter.writeLabel(labelTrue);
+
+        v.thenBranch.accept(this)
+
+        if (v.elseBranch.isDefined)  vmWriter.writeGoto(labelEnd)
+
+        vmWriter.writeLabel(labelFalse);
+
+        for (st <- v.elseBranch)  {
+            st.accept(this)
+            vmWriter.writeLabel(labelEnd)
+        }
+            
     }
 
 
