@@ -1,5 +1,7 @@
 package jackcompiler
 
+import scala.compat.Platform.EOL
+
 import jackcompiler.ast.* 
 
 val binOperators = Map (
@@ -13,7 +15,10 @@ val binOperators = Map (
 )
 
 
-class VMWriter extends ast.Visitor {
+class VisitWriter extends ast.Visitor {
+
+    var vmOutput =  new StringBuilder ("")
+
     def visitLetStatement (v: LetStatement) = {
         v.exp.accept(this)
         println("pop " +  v.id)
@@ -31,14 +36,16 @@ class VMWriter extends ast.Visitor {
     }
 
     def visitIntegerLiteral (v: IntegerLiteral) = {
-        println ("push const " + v.value)
+        //vmOutput.append (s"push constant ${v.value}\r\n" )
+        vmOutput.append ("push constant %d\n".format(10) )
+        
     }
 
     def visitBinaryExpression (v: BinaryExpression) = {
 
-        v.left.accept(this)      
-        v.right.accept(this)
-        println(vmOperator(v.operator))
+        //v.left.accept(this)      
+        //v.right.accept(this)
+       // vmOutput.append (vmOperator(v.operator)+EOL)
     }
 
     def visitUnaryExpression (v: UnaryExpression) = {

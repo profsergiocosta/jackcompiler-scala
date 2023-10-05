@@ -10,9 +10,9 @@ import java.security.Identity
 import scala.annotation.varargs
 
     
-class JackParser (val fName:String) {
+class JackParser (val source:String) {
 
-    val jt = new JackTokenizer (fName)
+    val jt = new JackTokenizer (source)
 
     var currToken : Token = null
     var peekToken : Token = jt.nextToken()
