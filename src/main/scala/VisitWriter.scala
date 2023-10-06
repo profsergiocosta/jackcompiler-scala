@@ -9,7 +9,7 @@ import jackcompiler.Command
 
 
 
-class VisitWriter extends ast.Visitor {
+class VisitWriter(val symbolTable: SymbolTable)  extends ast.Visitor {
 
 
     var vmWriter = VMWriter()
@@ -32,7 +32,10 @@ class VisitWriter extends ast.Visitor {
     }
 
     def visitVariable (v: Variable) = {
-        //print(v.varName)
+        
+        var sym = symbolTable.resolve(v.varName);
+        println(sym)
+        
     }
 
     def visitIntegerLiteral (v: IntegerLiteral) = {
