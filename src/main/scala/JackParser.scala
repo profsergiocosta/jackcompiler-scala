@@ -176,8 +176,12 @@ class JackParser (val source:String, val symbolTable: SymbolTable) {
       
       peekToken match {
         case TIdentifier (name) => {
+             kind match  {
+                case "field" => symbolTable.define(name,varType,Kind.FIELD)
+                case "static" => symbolTable.define(name,varType,Kind.STATIC)
+             }   
+
               nextToken()
-              //var vardec = ast.VarDeclaration(kind, varType , name)
               if (peekToken == TSymbol (',') ) {
                   nextToken()
                   parseListVarDeclaration(kind, varType)

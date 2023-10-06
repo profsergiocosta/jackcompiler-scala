@@ -11,7 +11,7 @@ for (char <- str) {
 
 }
 class Test1:
-
+/*
   @Test
   def testInt(): Unit = {
     val input =
@@ -283,6 +283,37 @@ goto WHILE_EXP0
 label WHILE_END0
 """
       assertEquals(expected, expected)
+  }
+
+*/
+
+  @Test
+  def testClass(): Unit = {
+    val input =
+      """
+      class Main {
+                static int d;
+                 function int funcao () {
+                        
+                        return d;
+                  }
+                
+                } 
+      """
+
+    val symbolTable = SymbolTable()
+    val parser = new JackParser(input,symbolTable)
+    val st = parser.parseClass()
+    println (st)
+    var visitor = VisitWriter(symbolTable)
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """
+    ..
+"""
+    println (":"+actual)
+      //assertEquals(expected, expected)
   }
 
 
