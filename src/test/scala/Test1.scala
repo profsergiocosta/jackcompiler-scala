@@ -18,7 +18,10 @@ class Test1:
       """10
       """
 
-    val parser = new JackParser(input)
+    
+    val symbolTable = SymbolTable()
+    val parser = new JackParser(input,symbolTable)
+
     val st = parser.parseExpression()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -36,7 +39,8 @@ class Test1:
       """10+20
       """
 
-    val parser = new JackParser(input)
+    val symbolTable = SymbolTable()
+    val parser = new JackParser(input,symbolTable)
     val st = parser.parseExpression()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -56,7 +60,8 @@ add
       """10* 20
       """
 
-    val parser = new JackParser(input)
+    val symbolTable = SymbolTable()
+    val parser = new JackParser(input,symbolTable)
     val st = parser.parseExpression()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -76,7 +81,8 @@ call Math.multiply 2
       """"OLA"
       """
 
-    val parser = new JackParser(input)
+    val symbolTable = SymbolTable()
+    val parser = new JackParser(input,symbolTable)
     val st = parser.parseExpression()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -103,7 +109,8 @@ call String.appendChar 2
       """false
       """
 
-    val parser = new JackParser(input)
+    val symbolTable = SymbolTable()
+    val parser = new JackParser(input,symbolTable)
     val st = parser.parseExpression()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -121,7 +128,8 @@ call String.appendChar 2
       """true
       """
 
-    val parser = new JackParser(input)
+    val symbolTable = SymbolTable()
+    val parser = new JackParser(input,symbolTable)
     val st = parser.parseExpression()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -139,7 +147,8 @@ not
       """this
       """
 
-    val parser = new JackParser(input)
+    val symbolTable = SymbolTable()
+    val parser = new JackParser(input,symbolTable)
     val st = parser.parseExpression()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -156,7 +165,8 @@ not
       """- 10
       """
 
-    val parser = new JackParser(input)
+    val symbolTable = SymbolTable()
+    val parser = new JackParser(input,symbolTable)
     val st = parser.parseExpression()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -175,7 +185,8 @@ neg
       """return;
       """
 
-    val parser = new JackParser(input)
+    val symbolTable = SymbolTable()
+    val parser = new JackParser(input,symbolTable)
     val st = parser.parseReturnStatement()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -194,7 +205,8 @@ return
       """return 10+20;
       """
 
-    val parser = new JackParser(input)
+    val symbolTable = SymbolTable()
+    val parser = new JackParser(input,symbolTable)
     val st = parser.parseReturnStatement()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -221,7 +233,8 @@ return
             }
       """
 
-    val parser = new JackParser(input)
+    val symbolTable = SymbolTable()
+    val parser = new JackParser(input,symbolTable)
     val st = parser.parseIfStatement()
     //println (st)
     var visitor = VisitWriter()
@@ -252,7 +265,8 @@ label IF_END0
             } 
       """
 
-    val parser = new JackParser(input)
+    val symbolTable = SymbolTable()
+    val parser = new JackParser(input,symbolTable)
     val st = parser.parseStatement()
     println (st)
     var visitor = VisitWriter()

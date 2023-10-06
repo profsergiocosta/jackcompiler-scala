@@ -10,7 +10,7 @@ import java.security.Identity
 import scala.annotation.varargs
 
     
-class JackParser (val source:String) {
+class JackParser (val source:String, val symbolTable: SymbolTable) {
 
     val jt = new JackTokenizer (source)
 
