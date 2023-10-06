@@ -6,7 +6,7 @@ import scala.collection.mutable
 object Kind extends Enumeration {
     type Kind = Value
     val STATIC, FIELD, ARG, VAR = Value
-}
+  }
 
 class SymbolTable {
 

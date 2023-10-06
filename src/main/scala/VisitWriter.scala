@@ -3,8 +3,6 @@ package jackcompiler
 import scala.compat.Platform.EOL
 
 import jackcompiler.ast.* 
-import jackcompiler.Segment
-import jackcompiler.Command
 
 
 
@@ -18,6 +16,29 @@ class VisitWriter(val symbolTable: SymbolTable)  extends ast.Visitor {
     private var whileLabelNum = 0
 
     def vmOutput = vmWriter.vmOutputString
+
+    val kindToSegment = Map(
+        Kind.STATIC -> Segment.STATIC,
+        Kind.FIELD  -> Segment.THIS,
+        Kind.VAR    -> Segment.LOCAL,
+        Kind.ARG    -> Segment.ARG
+    )
+
+
+
+    def visitClassDec(v:ClassDec) : Unit = {
+        v.subroutineDecs.foreach { st =>  st.accept (this) }
+    }
+    
+    def visitSubroutine(v:Subroutine) : Unit= {
+        
+        v.body.accept(this)
+    }
+    
+    def visitSubroutineBody(v:SubroutineBody) : Unit = {
+        v.statements.accept(this)
+    }
+
 
     def visitLetStatement (v: LetStatement) = {
         v.exp.accept(this)
@@ -33,8 +54,13 @@ class VisitWriter(val symbolTable: SymbolTable)  extends ast.Visitor {
 
     def visitVariable (v: Variable) = {
         
-        var sym = symbolTable.resolve(v.varName);
-        println(sym)
+        var symOption = symbolTable.resolve(v.varName);
+
+        symOption match {
+            case Some (sym) => vmWriter.writePush(kindToSegment(sym.kind), sym.index)
+            case None => println ("variavel nao encontrada") // criar uma exceção
+        }
+        
         
     }
 

@@ -7,6 +7,10 @@ import jackcompiler.Token
 
 abstract class Visitor {
 
+
+    def visitClassDec(v:ClassDec) : Unit
+    def visitSubroutine(v:Subroutine) : Unit
+    def visitSubroutineBody(v:SubroutineBody) : Unit
     def visitStatements (v: Statements) : Unit
     def visitLetStatement (v: LetStatement) : Unit
     def visitIfStatement (v: IfStatement) : Unit
@@ -46,6 +50,7 @@ abstract class Identifier extends Expression
 
 case class ClassDec (name: String, subroutineDecs :List[Subroutine]) extends Node {
     def accept (v: Visitor) = {
+        return v.visitClassDec(this)
 
     }
 }
@@ -54,13 +59,13 @@ case class ClassDec (name: String, subroutineDecs :List[Subroutine]) extends Nod
 
 case class Subroutine (modifier:String, funcType:String, name: String, body: SubroutineBody) extends Node {
     def accept (v: Visitor) = {
-
+        return v.visitSubroutine(this)
     }
 }
 
 case class SubroutineBody ( statements:Statements) extends Node {
     def accept (v: Visitor) = {
-
+        return v.visitSubroutineBody(this)
     }
 }
 

@@ -3,11 +3,7 @@ package jackcompiler
 
 
     
-import jackcompiler.ast as ast
-import jackcompiler.TSymbol
-import jackcompiler.ast.ReturnStatement
-import java.security.Identity
-import scala.annotation.varargs
+import jackcompiler.ast.* 
 
     
 class JackParser (val source:String, val symbolTable: SymbolTable) {

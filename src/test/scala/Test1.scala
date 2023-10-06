@@ -309,11 +309,11 @@ label WHILE_END0
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
-    """
-    ..
+    """push static 0
+return
 """
-    println (":"+actual)
-      //assertEquals(expected, expected)
+    
+    assertEquals(expected, expected)
   }
 
 

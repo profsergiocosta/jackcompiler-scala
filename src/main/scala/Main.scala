@@ -8,7 +8,7 @@ package jackcompiler
   //val source = scala.io.Source.fromFile("/home/sergio/developing/Main.jack")
   
   val input = "\"ola\""  //(source.getLines mkString "\n")
-
+/*
   val parser = JackParser(input)
   //val st = parser.parseClassVarDec()
   //val st = parser.parseClass()
@@ -20,7 +20,7 @@ package jackcompiler
   println(st)
   st.accept(visitor)
   println()
-  print (visitor.vmOutput)
+  print (visitor.vmOutput)*/
   
 
 def msg = "I was compiled by Scala 3. :)"
