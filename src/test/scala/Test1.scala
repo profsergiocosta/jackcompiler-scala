@@ -317,6 +317,47 @@ return
   }
 
 
+  @Test
+  def testSimpleFunctions(): Unit = {
+    val input =
+      """
+        class Main {
+ 
+                function int soma () {
+                        return  30;
+                 }
+                
+                 function void main () {
+                        //var int d;
+                        return;
+                  }
+                 
+      """
+
+    val symbolTable = SymbolTable()
+    val parser = new JackParser(input,symbolTable)
+    val st = parser.parseClass()
+    println (st)
+    var visitor = VisitWriter(symbolTable)
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """function Main.soma 0
+push constant 30
+return
+function Main.main 1
+push constant 0
+return 
+"""
+    
+            print (expected)
+      print ("atual")
+      print (":"+actual)
+      
+    //assertEquals(expected, expected)
+  }
+
+
   /*      print (expected)
       print ("atual")
       print (actual)

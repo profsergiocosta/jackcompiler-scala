@@ -64,4 +64,10 @@ class VMWriter {
   def writeReturn(): Unit = {
     vmOutput.append("return\n")
   }
+
+  def writeString(str:String) : Int = {
+    var pos = vmOutput.length
+    vmOutput.append(s"%str\n")
+    return pos
+  }
 }

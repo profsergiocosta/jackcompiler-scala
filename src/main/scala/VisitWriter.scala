@@ -32,11 +32,16 @@ class VisitWriter(val symbolTable: SymbolTable)  extends ast.Visitor {
     
     def visitSubroutine(v:Subroutine) : Unit= {
         
+        //var pos = writeString("__REPLACE__")
         v.body.accept(this)
+        //var nlocals = symbolTable.varCount(Kind.VAR);
+
+       // vmWriter.writeFunction(v.name, nlocals)
     }
     
     def visitSubroutineBody(v:SubroutineBody) : Unit = {
         v.statements.accept(this)
+
     }
 
 
