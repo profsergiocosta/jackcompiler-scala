@@ -6,7 +6,7 @@ package jackcompiler
 import jackcompiler.ast.* 
 
     
-class JackParser (val source:String, val symbolTable: SymbolTable) {
+class JackParser (val source:String) {
 
     val jt = new JackTokenizer (source)
 
@@ -162,7 +162,7 @@ class JackParser (val source:String, val symbolTable: SymbolTable) {
     }
 
     def parseParameterList() : List[ast.VarDeclaration] = {
-        if (peekTokenIs(TSymbol(')'))) List.empty[ast.VarDeclaration]
+        if (peekTokenIs(TSymbol(')'))) return List.empty[ast.VarDeclaration]
         
         var t = parseType();
         peekToken match {

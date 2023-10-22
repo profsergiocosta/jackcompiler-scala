@@ -11,7 +11,11 @@ abstract class Visitor {
 
     def visitClassDec(v:ClassDec) : Unit
     def visitSubroutine(v:Subroutine) : Unit
-    def visitSubroutineBody(v:SubroutineBody) : Unit
+    
+
+    def visitVarDeclaration(v:VarDeclaration) : Unit
+
+
     def visitStatements (v: Statements) : Unit
     def visitLetStatement (v: LetStatement) : Unit
     def visitIfStatement (v: IfStatement) : Unit
@@ -52,7 +56,7 @@ abstract class Identifier extends Expression
 
 case class VarDeclaration (val kind :Kind.Kind, val varType :String, val name :String  ) extends Node {
      def accept (v: Visitor) = {
-    
+            return v.visitVarDeclaration(this)
     }
 }
 
@@ -71,11 +75,7 @@ case class Subroutine (modifier:String, funcType:String, name: String, params:Li
     }
 }
 
-case class SubroutineBody ( vardecs:List[VarDeclaration], statements:Statements) extends Node {
-    def accept (v: Visitor) = {
-        return v.visitSubroutineBody(this)
-    }
-}
+
 
 
 

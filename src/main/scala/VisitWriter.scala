@@ -7,13 +7,15 @@ import jackcompiler.ast.*
 
 
 
-class VisitWriter(val symbolTable: SymbolTable)  extends ast.Visitor {
+class VisitWriter()  extends ast.Visitor {
 
 
     var vmWriter = VMWriter()
 
     private var ifLabelNum = 0
     private var whileLabelNum = 0
+    private val symbolTable= SymbolTable ()
+    private var className = ""
 
     def vmOutput = vmWriter.vmOutputString
 
@@ -27,22 +29,36 @@ class VisitWriter(val symbolTable: SymbolTable)  extends ast.Visitor {
 
 
     def visitClassDec(v:ClassDec) : Unit = {
+        className = v.name;
         v.subroutineDecs.foreach { st =>  st.accept (this) }
+    }
+
+    def visitVarDeclaration(v:VarDeclaration) : Unit = {
+        symbolTable.define(v.name, v.varType, v.kind)
+    
     }
     
     def visitSubroutine(v:Subroutine) : Unit= {
         
-        //var pos = writeString("__REPLACE__")
-        //v.body.accept(this)
-        //var nlocals = symbolTable.varCount(Kind.VAR);
+        symbolTable.startSubroutine()
 
-       // vmWriter.writeFunction(v.name, nlocals)
-    }
-    
-    def visitSubroutineBody(v:SubroutineBody) : Unit = {
+        v.params.foreach  { vardec =>
+                vardec.accept(this)
+        }
+
+        v.vars.foreach { vardec =>
+                vardec.accept(this)
+        }
+
+        var nlocals = symbolTable.varCount(Kind.VAR);
+        var funcName = className + "." + v.name
+        vmWriter.writeFunction(funcName, nlocals)
+        
         v.statements.accept(this)
 
     }
+    
+ 
 
 
     def visitLetStatement (v: LetStatement) = {
