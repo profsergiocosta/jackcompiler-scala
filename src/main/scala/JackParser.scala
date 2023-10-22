@@ -133,7 +133,7 @@ class JackParser (val source:String, val symbolTable: SymbolTable) {
             case TKeyword ("var") => {
                     nextToken()
                     var t = parseType()
-                    var vardec = parseListVarDeclaration("var",t) ++ parseVarDec()
+                    var vardec = parseListVarDeclaration(Kind.VAR,t) ++ parseVarDec()
                     return vardec
 
                 } 
@@ -145,11 +145,16 @@ class JackParser (val source:String, val symbolTable: SymbolTable) {
     def parseClassVarDec () : List[ast.VarDeclaration] = {
         peekToken match {
             case TKeyword (k)  => k match {
-                case "field" | "static" => {
+                case "field"  => {
                     nextToken()
                     var t = parseType()
-                    parseListVarDeclaration(k,t) ++ parseClassVarDec()
+                    parseListVarDeclaration(Kind.FIELD,t) ++ parseClassVarDec()
                 } 
+                case "static" => {
+                    nextToken()
+                    var t = parseType()
+                    parseListVarDeclaration(Kind.STATIC,t) ++ parseClassVarDec()
+                }
                 case _ => List.empty[ast.VarDeclaration]
             }
             case _ => List.empty[ast.VarDeclaration]
@@ -163,7 +168,7 @@ class JackParser (val source:String, val symbolTable: SymbolTable) {
         peekToken match {
              case TIdentifier (name) => {
                    nextToken();
-                   ast.VarDeclaration("arg", t, name) :: parseParameterList()
+                   ast.VarDeclaration(Kind.ARG, t, name) :: parseParameterList()
              }
                 
             case _ =>  throw Exception ("erro: parse parameter")
@@ -184,7 +189,7 @@ class JackParser (val source:String, val symbolTable: SymbolTable) {
     }
 */
 
-    def parseListVarDeclaration(kind: String, varType: String) : List[ast.VarDeclaration] = {
+    def parseListVarDeclaration(kind: Kind.Kind, varType: String) : List[ast.VarDeclaration] = {
       
       peekToken match {
         case TIdentifier (name) => {
@@ -225,8 +230,11 @@ class JackParser (val source:String, val symbolTable: SymbolTable) {
                     expectPeek(TSymbol('('))
                     var params = parseParameterList()
                     expectPeek(TSymbol(')'))
-                    var body = parseSubroutineBody()
-                    return  ast.Subroutine (k, ftype , fname, params, body) :: parseSubroutineDec()
+                    expectPeek(TSymbol('{'))
+                    var vardecs = parseVarDec()
+                    var sts = parseStatements()
+                    expectPeek(TSymbol('}'))
+                    return  ast.Subroutine (k, ftype , fname, params, vardecs, ast.Statements(sts)) :: parseSubroutineDec()
                 }
 
                 case _ => Nil

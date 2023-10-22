@@ -1,6 +1,7 @@
 package jackcompiler.ast
 
 import jackcompiler.Token
+import jackcompiler.Kind
 
 
 
@@ -49,7 +50,7 @@ abstract class Statement extends Node
 abstract class Identifier extends Expression
 
 
-case class VarDeclaration (val kind :String, val varType :String, val name :String  ) extends Node {
+case class VarDeclaration (val kind :Kind.Kind, val varType :String, val name :String  ) extends Node {
      def accept (v: Visitor) = {
     
     }
@@ -64,7 +65,7 @@ case class ClassDec (name: String,  classVardecs :List[VarDeclaration], subrouti
 
 
 
-case class Subroutine (modifier:String, funcType:String, name: String, params:List[VarDeclaration],body: SubroutineBody) extends Node {
+case class Subroutine (modifier:String, funcType:String, name: String, params:List[VarDeclaration],vars:List[VarDeclaration], statements: Statements) extends Node {
     def accept (v: Visitor) = {
         return v.visitSubroutine(this)
     }
