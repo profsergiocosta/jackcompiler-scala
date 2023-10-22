@@ -54,7 +54,21 @@ class VisitWriter()  extends ast.Visitor {
         var nlocals = symbolTable.varCount(Kind.VAR);
         var funcName = className + "." + v.name
         vmWriter.writeFunction(funcName, nlocals)
-        
+
+        v.modifier match {
+            case "constructor" => {
+                vmWriter.writePush(Segment.CONST, symbolTable.varCount(Kind.FIELD))
+                vmWriter.writeCall("Memory.alloc", 1)
+                vmWriter.writePop(Segment.POINTER, 0)
+            }
+            case "method"  => {
+                vmWriter.writePush(Segment.ARG, 0)
+                vmWriter.writePop(Segment.POINTER, 0)
+            }
+
+            case _ => {}
+        }
+
         v.statements.accept(this)
 
     }
@@ -63,9 +77,6 @@ class VisitWriter()  extends ast.Visitor {
 
 
     def visitLetStatement (v: LetStatement) = {
-        
-        
-        
 
         v.id match {
             case Variable(varName) => {
@@ -103,7 +114,8 @@ class VisitWriter()  extends ast.Visitor {
     }
 
     def visitDoStatement (v: DoStatement) = {
-        
+        v.subroutine.accept(this)
+        vmWriter.writePop(Segment.TEMP, 0);
     }
 
     def visitVariable (v: Variable) = {
@@ -169,7 +181,40 @@ class VisitWriter()  extends ast.Visitor {
     }
 
     def visitCall (v: Call) = {
+        var nargs = v.arguments.size
 
+        val parts = v.name.split("\\.") 
+
+        var funcName = v.name
+
+        if (parts.length == 1) { // metodo da propria classe
+                vmWriter.writePush(Segment.POINTER, 0) // ponteiro this
+                v.arguments.foreach {
+                    exp => exp.accept(this)
+                } 
+                funcName = className + "." + v.name
+                nargs+=1
+                
+        } else { // pode ser um metodo de um outro objeto ou uma função
+
+            symbolTable.resolve(parts(0)) match { 
+                case Some (sym) =>  {
+                    // é um metodo de outro objeto
+                    var funcName = sym.typeOf + "." + parts(1)
+                    vmWriter.writePush(kindToSegment(sym.kind), sym.index)
+                    nargs+=1
+                }
+                case None => {} // é uma funcao
+            }
+
+        }
+
+        v.arguments.foreach {
+            exp => exp.accept(this)
+        } 
+
+        vmWriter.writeCall(funcName, nargs);
+        
     }
 
     def visitKeywordLiteral (v: KeywordLiteral) = {

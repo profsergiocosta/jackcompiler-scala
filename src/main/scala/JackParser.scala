@@ -12,6 +12,7 @@ class JackParser (val source:String) {
 
     var currToken : Token = null
     var peekToken : Token = jt.nextToken()
+    var className = ""
 
 
     def nextToken ()  = {
@@ -23,12 +24,12 @@ class JackParser (val source:String) {
     def parseClass () : ast.ClassDec = {
         expectPeek(TKeyword("class"));
         expectPeek(TIdentifier(null)); // nao importa ainda o nome do identificador
-        var classname = currToken match { case TIdentifier (v) => v}
+        className = currToken match { case TIdentifier (v) => v}
         expectPeek(TSymbol('{'));
         var vardecs = parseClassVarDec()
         var subs = parseSubroutineDec()
         expectPeek(TSymbol('}'));
-        return ast.ClassDec (classname,vardecs, subs)
+        return ast.ClassDec (className,vardecs, subs)
     }
 
     def parseStatements () : List[ast.Statement] = {
@@ -168,7 +169,15 @@ class JackParser (val source:String) {
         peekToken match {
              case TIdentifier (name) => {
                    nextToken();
-                   ast.VarDeclaration(Kind.ARG, t, name) :: parseParameterList()
+                   var decl = ast.VarDeclaration(Kind.ARG, t, name) 
+                   
+                   if (peekTokenIs(TSymbol(',')))  {
+                        expectPeek(TSymbol (','))
+                        return decl::parseParameterList()
+                   }
+                                      
+                   else return List(decl)
+
              }
                 
             case _ =>  throw Exception ("erro: parse parameter")
@@ -307,15 +316,16 @@ class JackParser (val source:String) {
     def parseSubroutineCall () : ast.Expression = {
       var id = currToken match { case TIdentifier(i) => i}  
       
-      if (peekTokenIs(TSymbol('(')) ) {
+      if (peekTokenIs(TSymbol('(')) ) { // metodo da propria classe
         expectPeek(TSymbol('('))
         var args = parseExpressionList()
         expectPeek(TSymbol(')'))
-        return ast.Call(id,args)
-      } else {
+        var fname = id
+        return ast.Call(fname,args)
+      } else {  // funcao ou metodo de um objeto
         expectPeek(TSymbol('.'))
         expectPeek(TIdentifier(null))
-        var fname = currToken match { case TIdentifier(i) => i} 
+        var fname = id + "." + (currToken match { case TIdentifier(i) => i} )
         expectPeek(TSymbol('('))
         var args = parseExpressionList()
         expectPeek(TSymbol(')'))
