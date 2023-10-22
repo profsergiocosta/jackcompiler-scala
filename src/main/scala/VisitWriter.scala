@@ -30,6 +30,7 @@ class VisitWriter()  extends ast.Visitor {
 
     def visitClassDec(v:ClassDec) : Unit = {
         className = v.name;
+        v.classVardecs.foreach { st =>  st.accept (this) }
         v.subroutineDecs.foreach { st =>  st.accept (this) }
     }
 
@@ -39,8 +40,14 @@ class VisitWriter()  extends ast.Visitor {
     }
     
     def visitSubroutine(v:Subroutine) : Unit= {
+
+        ifLabelNum = 0
+        whileLabelNum = 0
         
         symbolTable.startSubroutine()
+
+        if (v.modifier == "method") 
+            symbolTable.define("this", className, Kind.ARG);
 
         v.params.foreach  { vardec =>
                 vardec.accept(this)
@@ -53,7 +60,21 @@ class VisitWriter()  extends ast.Visitor {
         var nlocals = symbolTable.varCount(Kind.VAR);
         var funcName = className + "." + v.name
         vmWriter.writeFunction(funcName, nlocals)
-        
+
+        v.modifier match {
+            case "constructor" => {
+                vmWriter.writePush(Segment.CONST, symbolTable.varCount(Kind.FIELD))
+                vmWriter.writeCall("Memory.alloc", 1)
+                vmWriter.writePop(Segment.POINTER, 0)
+            }
+            case "method"  => {
+                vmWriter.writePush(Segment.ARG, 0)
+                vmWriter.writePop(Segment.POINTER, 0)
+            }
+
+            case _ => {}
+        }
+
         v.statements.accept(this)
 
     }
@@ -62,25 +83,45 @@ class VisitWriter()  extends ast.Visitor {
 
 
     def visitLetStatement (v: LetStatement) = {
-        v.exp.accept(this)
-        
-        var symOption: Option[Symbol] = None
 
         v.id match {
-            case Variable(varName) => symOption = symbolTable.resolve(varName)
-            case IndexVariable(varName, _) => symOption = symbolTable.resolve(varName)
-        }    
-        
-        
+            case Variable(varName) => {
 
-        symOption match {
-            case Some (sym) => vmWriter.writePop(kindToSegment(sym.kind), sym.index)
-            case None => println ("variavel nao encontrada") // criar uma exceção
-        }
+                v.exp.accept(this)
+
+                symbolTable.resolve(varName) match {
+                    case Some (sym) => vmWriter.writePop(kindToSegment(sym.kind), sym.index)
+                    case None => println ("variavel nao encontrada") // criar uma exceção
+                }
+
+            }
+            case IndexVariable(varName, exp) => {
+
+                exp.accept(this)
+
+                symbolTable.resolve(varName) match {
+                    case Some (sym) => vmWriter.writePush(kindToSegment(sym.kind), sym.index)
+                    case None => println ("variavel nao encontrada") // criar uma exceção
+                }               
+
+                vmWriter.writeArithmetic(Command.ADD)
+                v.exp.accept(this)
+
+                // let arr[expression1] = expression2
+                vmWriter.writePop(Segment.TEMP, 0);    // salva a expression2 
+                vmWriter.writePop(Segment.POINTER, 1); // pop arr[expression1] into pointer 1
+                vmWriter.writePush(Segment.TEMP, 0);   // push result back onto stack
+                vmWriter.writePop(Segment.THAT, 0);    // Store right hand side evaluation in THAT 0.
+
+
+            }
+        }          
+
     }
 
     def visitDoStatement (v: DoStatement) = {
-        
+        v.subroutine.accept(this)
+        vmWriter.writePop(Segment.TEMP, 0);
     }
 
     def visitVariable (v: Variable) = {
@@ -95,6 +136,16 @@ class VisitWriter()  extends ast.Visitor {
         
     }
     def visitIndexVariable (v: IndexVariable) : Unit = {
+        v.exp.accept(this)
+
+        symbolTable.resolve(v.varName) match { // todo: extrair esse tratamento
+            case Some (sym) => vmWriter.writePush(kindToSegment(sym.kind), sym.index)
+            case None => println ("variavel nao encontrada") // criar uma exceção
+        }
+
+        vmWriter.writeArithmetic(Command.ADD)
+        vmWriter.writePop(Segment.POINTER,1)
+        vmWriter.writePush(Segment.THAT,0)
 
     }
 
@@ -124,6 +175,11 @@ class VisitWriter()  extends ast.Visitor {
             case '/' => vmWriter.writeCall ("Math.divide", 2)
             case '+' => vmWriter.writeArithmetic(Command.ADD) 
             case '-' => vmWriter.writeArithmetic(Command.SUB) 
+            case '>' => vmWriter.writeArithmetic(Command.GT) 
+            case '<' => vmWriter.writeArithmetic(Command.LT) 
+            case '=' => vmWriter.writeArithmetic(Command.EQ) 
+            case '&' => vmWriter.writeArithmetic(Command.AND) 
+            case '|' => vmWriter.writeArithmetic(Command.OR) 
         }
     }
 
@@ -136,7 +192,37 @@ class VisitWriter()  extends ast.Visitor {
     }
 
     def visitCall (v: Call) = {
+        var nargs = v.arguments.size
 
+        val parts = v.name.split("\\.") 
+
+        var funcName = v.name
+
+        if (parts.length == 1) { // metodo da propria classe
+                vmWriter.writePush(Segment.POINTER, 0) // ponteiro this
+                funcName = className + "." + v.name
+                nargs+=1
+                
+        } else { // pode ser um metodo de um outro objeto ou uma função
+
+                symbolTable.resolve(parts(0)) match { 
+                case Some (sym) =>  {
+                    // é um metodo de outro objeto
+                    funcName = sym.typeOf + "." + parts(1)
+                    vmWriter.writePush(kindToSegment(sym.kind), sym.index)
+                    nargs+=1
+                }
+                case None => {} // é uma funcao
+            }
+
+        }
+
+        v.arguments.foreach {
+            exp => exp.accept(this)
+        } 
+
+        vmWriter.writeCall(funcName, nargs);
+        
     }
 
     def visitKeywordLiteral (v: KeywordLiteral) = {

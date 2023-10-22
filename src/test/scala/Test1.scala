@@ -286,7 +286,7 @@ label IF_END0
     
     val parser = new JackParser(input)
     val st = parser.parseStatement()
-    println (st)
+    //println (st)
     var visitor = VisitWriter()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
@@ -399,10 +399,6 @@ push constant 0
 return
 """
 
-      println ("expected")
-      print (expected)
-      println ("atual")
-      println (actual)
 
       assertEquals(expected, actual)
   }
@@ -414,10 +410,13 @@ return
     val input =
       """
       class Main {
+
+            static int y;
             
               function void main () {
-                  var int x;
-                let x = 42+y-4;
+                var int x;
+                let x = 42+y;
+                return x;
               }
             }
       """
@@ -425,9 +424,7 @@ return
     
     val parser = new JackParser(input)
     val st = parser.parseClass()
-    println ("tesslet2")
-    print(st)
-   
+
     var visitor = VisitWriter()
     st.accept(visitor)
    
@@ -435,19 +432,267 @@ return
     val expected =
     """function Main.main 1
 push constant 42
+push static 0
+add
+pop local 0
+push local 0
+return
+"""
+
+      
+      assertEquals(expected, actual)
+      
+  }
+
+
+  @Test
+  def testArray(): Unit = {
+    val input =
+      """
+            class Main {
+                function void main () {
+                    var Array v;
+                    let v[2] = v[3] + 42;
+                    return;
+                }
+            }
+      """
+
+    
+    val parser = new JackParser(input)
+    val st = parser.parseClass()
+
+    var visitor = VisitWriter()
+    st.accept(visitor)
+   
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """function Main.main 1
+push constant 2
+push local 0
+add
+push constant 3
+push local 0
+add
+pop pointer 1
+push that 0
+push constant 42
+add
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 0
+return
+"""
+      assertEquals(expected, actual)
+
+  }
+
+
+  @Test
+  def testCallFunction(): Unit = {
+    val input =
+      """
+  class Main {
+                function int soma (int x, int y) {
+                       return  x + y;
+                }
+               
+                function void main () {
+                       var int d;
+                       let d = Main.soma(4,5);
+                       return;
+                 }
+               
+               }
+      """
+
+    
+    val parser = new JackParser(input)
+    val st = parser.parseClass()
+    print (st)
+
+    var visitor = VisitWriter()
+    st.accept(visitor)
+   
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """function Main.soma 0
+push argument 0
+push argument 1
+add
+return
+function Main.main 1
+push constant 4
+push constant 5
+call Main.soma 2
+pop local 0
+push constant 0
+return
+"""
+      assertEquals(expected, actual)
+  }
+
+
+  @Test
+  def testCallMethod(): Unit = {
+    val input =
+      """
+  class Main {
+                field Point p;
+ 
+                function void main () {
+                       var int d;
+                       let d = p.getX();
+                       return;
+                 }
+               
+               }
+      """
+
+    
+    val parser = new JackParser(input)
+    val st = parser.parseClass()
+
+
+    var visitor = VisitWriter()
+    st.accept(visitor)
+   
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """function Main.main 1
+push this 0
+call Point.getX 1
 pop local 0
 push constant 0
 return
 """
 
-      println ("expected")
-      print (expected)
-      println ("atual")
-      println (actual)
-      
-      //assertEquals(expected, actual)
-      
+
+    assertEquals(expected, actual)
   }
+
+
+  @Test
+  def testDoStatement(): Unit = {
+    val input =
+      """
+            class Main {
+                function void main () {
+                    var int x;
+                    let x = 10;
+                    do Output.printInt(x);
+                    return;
+                }
+            }
+      """
+
+    
+    val parser = new JackParser(input)
+    val st = parser.parseClass()
+    print (st)
+
+    var visitor = VisitWriter()
+    st.accept(visitor)
+   
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """function Main.main 1
+push constant 10
+pop local 0
+push local 0
+call Output.printInt 1
+pop temp 0
+push constant 0
+return
+"""
+   assertEquals(expected, actual)
+}
+
+ 
+  @Test
+  def testMethodsConstructor(): Unit = {
+    val input =
+      """
+            class Point {
+                field int x, y;
+            
+                method int getX () {
+                    return x;
+                }
+            
+                method int getY () {
+                    return y;
+                }
+            
+                method void print () {
+                    do Output.printInt(getX());
+                    do Output.printInt(getY());
+                    return;
+                }
+            
+                constructor Point new(int Ax, int Ay) { 
+                  var int w;             
+                  let x = Ax;
+                  let y = Ay;
+                  let w = 42;
+                  let x = w;
+                  return this;
+               }
+              }
+      """
+
+    
+    val parser = new JackParser(input)
+    val st = parser.parseClass()
+
+    var visitor = VisitWriter()
+    st.accept(visitor)
+   
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """function Point.getX 0
+push argument 0
+pop pointer 0
+push this 0
+return
+function Point.getY 0
+push argument 0
+pop pointer 0
+push this 1
+return
+function Point.print 0
+push argument 0
+pop pointer 0
+push pointer 0
+call Point.getX 1
+call Output.printInt 1
+pop temp 0
+push pointer 0
+call Point.getY 1
+call Output.printInt 1
+pop temp 0
+push constant 0
+return
+function Point.new 1
+push constant 2
+call Memory.alloc 1
+pop pointer 0
+push argument 0
+pop this 0
+push argument 1
+pop this 1
+push constant 42
+pop local 0
+push local 0
+pop this 0
+push pointer 0
+return
+"""
+  assertEquals(expected, actual)
+      
+}
 
 
 
