@@ -210,13 +210,6 @@ class JackParser (val source:String) {
       
     }
 
-    def parseSubroutineBody () : ast.SubroutineBody = {
-        expectPeek(TSymbol('{'))
-        var vardecs = parseVarDec()
-        var sts = parseStatements()
-        expectPeek(TSymbol('}'))
-        return ast.SubroutineBody(vardecs , ast.Statements(sts))
-    }
 
     def parseSubroutineDec() : List[ast.Subroutine]  = {
         peekToken match {

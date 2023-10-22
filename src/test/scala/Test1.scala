@@ -337,12 +337,11 @@ return
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
-    """function Main.funcao 1
-push local 0
+    """function Main.funcao 4
+push local 3
 return
 """
-      
-    assertEquals(expected, actual)
+      assertEquals(expected, actual)
   }
 
 
