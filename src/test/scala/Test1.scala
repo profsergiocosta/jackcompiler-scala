@@ -286,7 +286,7 @@ label IF_END0
     
     val parser = new JackParser(input)
     val st = parser.parseStatement()
-    println (st)
+    //println (st)
     var visitor = VisitWriter()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
@@ -399,10 +399,6 @@ push constant 0
 return
 """
 
-      println ("expected")
-      print (expected)
-      println ("atual")
-      println (actual)
 
       assertEquals(expected, actual)
   }
@@ -414,10 +410,13 @@ return
     val input =
       """
       class Main {
+
+            static int y;
             
               function void main () {
-                  var int x;
-                let x = 42+y-4;
+                var int x;
+                let x = 42+y;
+                return x;
               }
             }
       """
@@ -425,9 +424,7 @@ return
     
     val parser = new JackParser(input)
     val st = parser.parseClass()
-    println ("tesslet2")
-    print(st)
-   
+
     var visitor = VisitWriter()
     st.accept(visitor)
    
@@ -435,17 +432,59 @@ return
     val expected =
     """function Main.main 1
 push constant 42
+push static 0
+add
 pop local 0
-push constant 0
+push local 0
 return
 """
 
-      println ("expected")
-      print (expected)
-      println ("atual")
-      println (actual)
       
-      //assertEquals(expected, actual)
+      assertEquals(expected, actual)
+      
+  }
+
+
+    @Test
+  def testArray(): Unit = {
+    val input =
+      """
+            class Main {
+                function void main () {
+                    var Array v;
+                    let v[2] = v[3] + 42;
+                    return;
+                }
+            }
+      """
+
+    
+    val parser = new JackParser(input)
+    val st = parser.parseClass()
+
+    var visitor = VisitWriter()
+    st.accept(visitor)
+   
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """function Main.main 1
+push constant 2
+push local 0
+add
+push constant 3
+push local 0
+add
+pop pointer 1
+push that 0
+push constant 42
+add
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 0
+return
+"""
       
   }
 
