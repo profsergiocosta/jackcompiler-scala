@@ -6,7 +6,7 @@ package jackcompiler
 import jackcompiler.ast.* 
 
     
-class JackParser (val source:String, val symbolTable: SymbolTable) {
+class JackParser (val source:String) {
 
     val jt = new JackTokenizer (source)
 
@@ -28,7 +28,7 @@ class JackParser (val source:String, val symbolTable: SymbolTable) {
         var vardecs = parseClassVarDec()
         var subs = parseSubroutineDec()
         expectPeek(TSymbol('}'));
-        return ast.ClassDec (classname, subs)
+        return ast.ClassDec (classname,vardecs, subs)
     }
 
     def parseStatements () : List[ast.Statement] = {
@@ -127,35 +127,56 @@ class JackParser (val source:String, val symbolTable: SymbolTable) {
     }
 
 
-    def parseVarDec () : Unit = {
+
+    def parseVarDec () : List[ast.VarDeclaration] = {
         peekToken match {
             case TKeyword ("var") => {
                     nextToken()
                     var t = parseType()
-                    parseListVarDeclaration("var",t) 
-                    parseVarDec()
+                    var vardec = parseListVarDeclaration(Kind.VAR,t) ++ parseVarDec()
+                    return vardec
 
                 } 
-                case _ => return
+                case _ => Nil
             }
     }
     
 
-    def parseClassVarDec () : Unit = {
+    def parseClassVarDec () : List[ast.VarDeclaration] = {
         peekToken match {
             case TKeyword (k)  => k match {
-                case "field" | "static" => {
+                case "field"  => {
                     nextToken()
                     var t = parseType()
-                    parseListVarDeclaration(k,t)
-                    parseClassVarDec()
+                    parseListVarDeclaration(Kind.FIELD,t) ++ parseClassVarDec()
                 } 
-                case _ => return
+                case "static" => {
+                    nextToken()
+                    var t = parseType()
+                    parseListVarDeclaration(Kind.STATIC,t) ++ parseClassVarDec()
+                }
+                case _ => List.empty[ast.VarDeclaration]
             }
-            case _ => return
+            case _ => List.empty[ast.VarDeclaration]
         }
     }
 
+    def parseParameterList() : List[ast.VarDeclaration] = {
+        if (peekTokenIs(TSymbol(')'))) return List.empty[ast.VarDeclaration]
+        
+        var t = parseType();
+        peekToken match {
+             case TIdentifier (name) => {
+                   nextToken();
+                   ast.VarDeclaration(Kind.ARG, t, name) :: parseParameterList()
+             }
+                
+            case _ =>  throw Exception ("erro: parse parameter")
+        }
+
+    }
+
+/*
     def parseParameterList() : Unit = {
         if (peekTokenIs(TSymbol(')'))) return
 
@@ -166,38 +187,29 @@ class JackParser (val source:String, val symbolTable: SymbolTable) {
             parseParameterList()
         }
     }
+*/
 
-
-    def parseListVarDeclaration(kind: String, varType: String) : Unit = {
+    def parseListVarDeclaration(kind: Kind.Kind, varType: String) : List[ast.VarDeclaration] = {
       
       peekToken match {
         case TIdentifier (name) => {
-             kind match  {
-                case "field" => symbolTable.define(name,varType,Kind.FIELD)
-                case "static" => symbolTable.define(name,varType,Kind.STATIC)
-             }   
-
               nextToken()
-              if (peekToken == TSymbol (',') ) {
-                  nextToken()
-                  parseListVarDeclaration(kind, varType)
-              } else {
-                  expectPeek(TSymbol(';'))
-              }
+              ast.VarDeclaration(kind, varType , name) :: parseListVarDeclaration(kind, varType)
           } 
-                  
+          case TSymbol (',') => {
+            nextToken()
+            parseListVarDeclaration(kind, varType)
+         }  
+         case TSymbol (';') => {
+            nextToken()
+            Nil
+         }
+               
         case _ =>  throw Exception ("erro: identifier expected")
       }
       
     }
 
-    def parseSubroutineBody () : ast.SubroutineBody = {
-        expectPeek(TSymbol('{'))
-        var vardecs = parseVarDec()
-        var sts = parseStatements()
-        expectPeek(TSymbol('}'))
-        return ast.SubroutineBody( ast.Statements(sts))
-    }
 
     def parseSubroutineDec() : List[ast.Subroutine]  = {
         peekToken match {
@@ -209,10 +221,13 @@ class JackParser (val source:String, val symbolTable: SymbolTable) {
                     expectPeek(TIdentifier(null))
                     var fname = currToken match { case TIdentifier (v) => v}
                     expectPeek(TSymbol('('))
-                    parseParameterList()
+                    var params = parseParameterList()
                     expectPeek(TSymbol(')'))
-                    var body = parseSubroutineBody()
-                    return  ast.Subroutine (k, ftype , fname, body) :: parseSubroutineDec()
+                    expectPeek(TSymbol('{'))
+                    var vardecs = parseVarDec()
+                    var sts = parseStatements()
+                    expectPeek(TSymbol('}'))
+                    return  ast.Subroutine (k, ftype , fname, params, vardecs, ast.Statements(sts)) :: parseSubroutineDec()
                 }
 
                 case _ => Nil

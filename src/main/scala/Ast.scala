@@ -1,6 +1,7 @@
 package jackcompiler.ast
 
 import jackcompiler.Token
+import jackcompiler.Kind
 
 
 
@@ -10,7 +11,11 @@ abstract class Visitor {
 
     def visitClassDec(v:ClassDec) : Unit
     def visitSubroutine(v:Subroutine) : Unit
-    def visitSubroutineBody(v:SubroutineBody) : Unit
+    
+
+    def visitVarDeclaration(v:VarDeclaration) : Unit
+
+
     def visitStatements (v: Statements) : Unit
     def visitLetStatement (v: LetStatement) : Unit
     def visitIfStatement (v: IfStatement) : Unit
@@ -19,9 +24,8 @@ abstract class Visitor {
     def visitDoStatement (v: DoStatement) : Unit
 
 
-
-    def visitExpression (v: Expression) : Unit
     def visitVariable (v: Variable) : Unit
+    def visitIndexVariable (v: IndexVariable) : Unit
     def visitIntegerLiteral (v: IntegerLiteral) : Unit
     def visitStringLiteral (v: StringLiteral) : Unit
     def visitKeywordLiteral (v: KeywordLiteral) : Unit
@@ -39,16 +43,18 @@ abstract class Node {
     def accept(v: Visitor) :Unit
 }
 
-abstract class Expression extends Node {
-     def accept (v: Visitor) = {
-        return v.visitExpression(this)
-    }
-}
-
+abstract class Expression extends Node 
 abstract class Statement extends Node
 abstract class Identifier extends Expression
 
-case class ClassDec (name: String, subroutineDecs :List[Subroutine]) extends Node {
+
+case class VarDeclaration (val kind :Kind.Kind, val varType :String, val name :String  ) extends Node {
+     def accept (v: Visitor) = {
+            return v.visitVarDeclaration(this)
+    }
+}
+
+case class ClassDec (name: String,  classVardecs :List[VarDeclaration], subroutineDecs :List[Subroutine]) extends Node {
     def accept (v: Visitor) = {
         return v.visitClassDec(this)
 
@@ -57,17 +63,13 @@ case class ClassDec (name: String, subroutineDecs :List[Subroutine]) extends Nod
 
 
 
-case class Subroutine (modifier:String, funcType:String, name: String, body: SubroutineBody) extends Node {
+case class Subroutine (modifier:String, funcType:String, name: String, params:List[VarDeclaration],vars:List[VarDeclaration], statements: Statements) extends Node {
     def accept (v: Visitor) = {
         return v.visitSubroutine(this)
     }
 }
 
-case class SubroutineBody ( statements:Statements) extends Node {
-    def accept (v: Visitor) = {
-        return v.visitSubroutineBody(this)
-    }
-}
+
 
 
 
@@ -91,7 +93,11 @@ case class Variable (val varName:String) extends Identifier  {
     }
 }
 
-case class IndexVariable (val varName: String, exp: Expression) extends Identifier 
+case class IndexVariable (val varName: String, exp: Expression) extends Identifier  {
+    override def accept (v: Visitor) = {
+        return v.visitIndexVariable(this)
+    }
+}
 case class IntegerLiteral (val value:Int) extends Expression  {
 
     override def accept (v: Visitor) = {

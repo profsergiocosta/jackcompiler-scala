@@ -7,13 +7,15 @@ import jackcompiler.ast.*
 
 
 
-class VisitWriter(val symbolTable: SymbolTable)  extends ast.Visitor {
+class VisitWriter()  extends ast.Visitor {
 
 
     var vmWriter = VMWriter()
 
     private var ifLabelNum = 0
     private var whileLabelNum = 0
+    private val symbolTable= SymbolTable ()
+    private var className = ""
 
     def vmOutput = vmWriter.vmOutputString
 
@@ -27,30 +29,54 @@ class VisitWriter(val symbolTable: SymbolTable)  extends ast.Visitor {
 
 
     def visitClassDec(v:ClassDec) : Unit = {
+        className = v.name;
         v.subroutineDecs.foreach { st =>  st.accept (this) }
+    }
+
+    def visitVarDeclaration(v:VarDeclaration) : Unit = {
+        symbolTable.define(v.name, v.varType, v.kind)
+    
     }
     
     def visitSubroutine(v:Subroutine) : Unit= {
         
-        //var pos = writeString("__REPLACE__")
-        v.body.accept(this)
-        //var nlocals = symbolTable.varCount(Kind.VAR);
+        symbolTable.startSubroutine()
 
-       // vmWriter.writeFunction(v.name, nlocals)
-    }
-    
-    def visitSubroutineBody(v:SubroutineBody) : Unit = {
+        v.params.foreach  { vardec =>
+                vardec.accept(this)
+        }
+
+        v.vars.foreach { vardec =>
+                vardec.accept(this)
+        }
+
+        var nlocals = symbolTable.varCount(Kind.VAR);
+        var funcName = className + "." + v.name
+        vmWriter.writeFunction(funcName, nlocals)
+        
         v.statements.accept(this)
 
     }
+    
+ 
 
 
     def visitLetStatement (v: LetStatement) = {
         v.exp.accept(this)
-        println("pop " +  v.id)
-    }
-    def visitExpression (v: Expression) = {
+        
+        var symOption: Option[Symbol] = None
 
+        v.id match {
+            case Variable(varName) => symOption = symbolTable.resolve(varName)
+            case IndexVariable(varName, _) => symOption = symbolTable.resolve(varName)
+        }    
+        
+        
+
+        symOption match {
+            case Some (sym) => vmWriter.writePop(kindToSegment(sym.kind), sym.index)
+            case None => println ("variavel nao encontrada") // criar uma exceção
+        }
     }
 
     def visitDoStatement (v: DoStatement) = {
@@ -67,6 +93,9 @@ class VisitWriter(val symbolTable: SymbolTable)  extends ast.Visitor {
         }
         
         
+    }
+    def visitIndexVariable (v: IndexVariable) : Unit = {
+
     }
 
     def visitIntegerLiteral (v: IntegerLiteral) = {
@@ -94,6 +123,7 @@ class VisitWriter(val symbolTable: SymbolTable)  extends ast.Visitor {
             case '*' => vmWriter.writeCall ("Math.multiply",2)
             case '/' => vmWriter.writeCall ("Math.divide", 2)
             case '+' => vmWriter.writeArithmetic(Command.ADD) 
+            case '-' => vmWriter.writeArithmetic(Command.SUB) 
         }
     }
 

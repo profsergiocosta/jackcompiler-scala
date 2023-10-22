@@ -3,15 +3,11 @@ package jackcompiler
 
 import scala.collection.mutable
 
-object Kind extends Enumeration {
-    type Kind = Value
-    val STATIC, FIELD, ARG, VAR = Value
-  }
+
+case class Symbol(name: String, typeOf: String, kind: Kind.Kind, index: Int)
 
 class SymbolTable {
-
-
-  case class Symbol(name: String, typeOf: String, kind: Kind.Kind, index: Int)
+  
 
   private val classScope: mutable.Map[String, Symbol] = mutable.Map()
   private val subroutineScope: mutable.Map[String, Symbol] = mutable.Map()

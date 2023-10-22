@@ -3,15 +3,8 @@ import org.junit.Assert.*
 
 import jackcompiler.*
 
-def imprime (str:String) : Unit = {
-for (char <- str) {
-  val asciiCode = char.toInt
-  println(s"Caractere: $char | Código ASCII: $asciiCode")
-}
-
-}
 class Test1:
-/*
+
   @Test
   def testInt(): Unit = {
     val input =
@@ -19,8 +12,8 @@ class Test1:
       """
 
     
-    val symbolTable = SymbolTable()
-    val parser = new JackParser(input,symbolTable)
+    
+    val parser = new JackParser(input)
 
     val st = parser.parseExpression()
     var visitor = VisitWriter()
@@ -39,8 +32,8 @@ class Test1:
       """10+20
       """
 
-    val symbolTable = SymbolTable()
-    val parser = new JackParser(input,symbolTable)
+    
+    val parser = new JackParser(input)
     val st = parser.parseExpression()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -60,8 +53,8 @@ add
       """10* 20
       """
 
-    val symbolTable = SymbolTable()
-    val parser = new JackParser(input,symbolTable)
+    
+    val parser = new JackParser(input)
     val st = parser.parseExpression()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -74,6 +67,31 @@ call Math.multiply 2
       assertEquals(expected, actual)
   }
 
+    @Test
+  def testSimpleExpression3(): Unit = {
+    val input =
+      """10 * 20 * 30
+      """
+
+    
+    val parser = new JackParser(input)
+    val st = parser.parseExpression()
+    var visitor = VisitWriter()
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """push constant 10
+push constant 20
+call Math.multiply 2
+push constant 30
+call Math.multiply 2
+"""
+
+
+      assertEquals(expected, actual)
+  }
+
+
 
   @Test
   def testString(): Unit = {
@@ -81,8 +99,8 @@ call Math.multiply 2
       """"OLA"
       """
 
-    val symbolTable = SymbolTable()
-    val parser = new JackParser(input,symbolTable)
+    
+    val parser = new JackParser(input)
     val st = parser.parseExpression()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -109,8 +127,8 @@ call String.appendChar 2
       """false
       """
 
-    val symbolTable = SymbolTable()
-    val parser = new JackParser(input,symbolTable)
+    
+    val parser = new JackParser(input)
     val st = parser.parseExpression()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -128,8 +146,8 @@ call String.appendChar 2
       """true
       """
 
-    val symbolTable = SymbolTable()
-    val parser = new JackParser(input,symbolTable)
+    
+    val parser = new JackParser(input)
     val st = parser.parseExpression()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -147,8 +165,8 @@ not
       """this
       """
 
-    val symbolTable = SymbolTable()
-    val parser = new JackParser(input,symbolTable)
+    
+    val parser = new JackParser(input)
     val st = parser.parseExpression()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -165,8 +183,8 @@ not
       """- 10
       """
 
-    val symbolTable = SymbolTable()
-    val parser = new JackParser(input,symbolTable)
+    
+    val parser = new JackParser(input)
     val st = parser.parseExpression()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -185,8 +203,8 @@ neg
       """return;
       """
 
-    val symbolTable = SymbolTable()
-    val parser = new JackParser(input,symbolTable)
+    
+    val parser = new JackParser(input)
     val st = parser.parseReturnStatement()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -205,8 +223,8 @@ return
       """return 10+20;
       """
 
-    val symbolTable = SymbolTable()
-    val parser = new JackParser(input,symbolTable)
+    
+    val parser = new JackParser(input)
     val st = parser.parseReturnStatement()
     var visitor = VisitWriter()
     st.accept(visitor)
@@ -233,8 +251,8 @@ return
             }
       """
 
-    val symbolTable = SymbolTable()
-    val parser = new JackParser(input,symbolTable)
+    
+    val parser = new JackParser(input)
     val st = parser.parseIfStatement()
     //println (st)
     var visitor = VisitWriter()
@@ -265,8 +283,8 @@ label IF_END0
             } 
       """
 
-    val symbolTable = SymbolTable()
-    val parser = new JackParser(input,symbolTable)
+    
+    val parser = new JackParser(input)
     val st = parser.parseStatement()
     println (st)
     var visitor = VisitWriter()
@@ -285,37 +303,6 @@ label WHILE_END0
       assertEquals(expected, expected)
   }
 
-*/
-
-  @Test
-  def testClass(): Unit = {
-    val input =
-      """
-      class Main {
-                static int d;
-                 function int funcao () {
-                        
-                        return d;
-                  }
-                
-                } 
-      """
-
-    val symbolTable = SymbolTable()
-    val parser = new JackParser(input,symbolTable)
-    val st = parser.parseClass()
-    println (st)
-    var visitor = VisitWriter(symbolTable)
-    st.accept(visitor)
-    val actual = visitor.vmOutput.toString
-    val expected =
-    """push static 0
-return
-"""
-    
-    assertEquals(expected, expected)
-  }
-
 
   @Test
   def testSimpleFunctions(): Unit = {
@@ -328,17 +315,17 @@ return
                  }
                 
                  function void main () {
-                        //var int d;
+                        var int d;
                         return;
                   }
-                 
+               }  
       """
 
-    val symbolTable = SymbolTable()
-    val parser = new JackParser(input,symbolTable)
+    
+    val parser = new JackParser(input)
     val st = parser.parseClass()
-    println (st)
-    var visitor = VisitWriter(symbolTable)
+ 
+    var visitor = VisitWriter()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
@@ -347,18 +334,128 @@ push constant 30
 return
 function Main.main 1
 push constant 0
-return 
+return
 """
-    
-            print (expected)
-      print ("atual")
-      print (":"+actual)
       
-    //assertEquals(expected, expected)
+    assertEquals(expected, actual)
   }
 
 
-  /*      print (expected)
-      print ("atual")
-      print (actual)
+  @Test
+  def testSimpleFunctionWithVar(): Unit = {
+    val input =
+      """
+        class Main {
+                
+                 function void funcao () {
+                        var int a, b,c, d;
+                        return d;
+                  }
+               }  
+      """
+
+    
+    val parser = new JackParser(input)
+    val st = parser.parseClass()
+ 
+    var visitor = VisitWriter()
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """function Main.funcao 4
+push local 3
+return
+"""
+      assertEquals(expected, actual)
+  }
+
+
+  @Test
+  def testLet(): Unit = {
+    val input =
+      """
+            class Main {
+            
+              function void main () {
+                  var int x;
+                  let x = 42;
+                  return;
+              }
+            } 
+      """
+
+    
+    val parser = new JackParser(input)
+    val st = parser.parseClass()
+ 
+    var visitor = VisitWriter()
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """function Main.main 1
+push constant 42
+pop local 0
+push constant 0
+return
+"""
+
+      println ("expected")
+      print (expected)
+      println ("atual")
+      println (actual)
+
+      assertEquals(expected, actual)
+  }
+
+  
+
+  @Test
+  def testLet2(): Unit = {
+    val input =
+      """
+      class Main {
+            
+              function void main () {
+                  var int x;
+                let x = 42+y-4;
+              }
+            }
+      """
+
+    
+    val parser = new JackParser(input)
+    val st = parser.parseClass()
+    println ("tesslet2")
+    print(st)
+   
+    var visitor = VisitWriter()
+    st.accept(visitor)
+   
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """function Main.main 1
+push constant 42
+pop local 0
+push constant 0
+return
+"""
+
+      println ("expected")
+      print (expected)
+      println ("atual")
+      println (actual)
+      
+      //assertEquals(expected, actual)
+      
+  }
+
+
+
+
+
+  /*      
+      println ("expected")
+      print (expected)
+      println ("atual")
+      println (actual)
       */
