@@ -490,7 +490,7 @@ return
   }
 
 
-    @Test
+  @Test
   def testCallFunction(): Unit = {
     val input =
       """
@@ -536,6 +536,45 @@ return
 
 
   @Test
+  def testCallMethod(): Unit = {
+    val input =
+      """
+  class Main {
+                field Point p;
+ 
+                function void main () {
+                       var int d;
+                       let d = p.getX();
+                       return;
+                 }
+               
+               }
+      """
+
+    
+    val parser = new JackParser(input)
+    val st = parser.parseClass()
+
+
+    var visitor = VisitWriter()
+    st.accept(visitor)
+   
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """function Main.main 1
+push this 0
+call Point.getX 1
+pop local 0
+push constant 0
+return
+"""
+
+
+    assertEquals(expected, actual)
+  }
+
+
+  @Test
   def testDoStatement(): Unit = {
     val input =
       """
@@ -569,7 +608,7 @@ push constant 0
 return
 """
    assertEquals(expected, actual)
-  }
+}
 
  
   @Test
@@ -651,9 +690,9 @@ pop this 0
 push pointer 0
 return
 """
-    assertEquals(expected, actual)
+  assertEquals(expected, actual)
       
-  }
+}
 
 
 

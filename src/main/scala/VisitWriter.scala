@@ -40,8 +40,14 @@ class VisitWriter()  extends ast.Visitor {
     }
     
     def visitSubroutine(v:Subroutine) : Unit= {
+
+        ifLabelNum = 0
+        whileLabelNum = 0
         
         symbolTable.startSubroutine()
+
+        if (v.modifier == "method") 
+            symbolTable.define("this", className, Kind.ARG);
 
         v.params.foreach  { vardec =>
                 vardec.accept(this)
@@ -169,6 +175,11 @@ class VisitWriter()  extends ast.Visitor {
             case '/' => vmWriter.writeCall ("Math.divide", 2)
             case '+' => vmWriter.writeArithmetic(Command.ADD) 
             case '-' => vmWriter.writeArithmetic(Command.SUB) 
+            case '>' => vmWriter.writeArithmetic(Command.GT) 
+            case '<' => vmWriter.writeArithmetic(Command.LT) 
+            case '=' => vmWriter.writeArithmetic(Command.EQ) 
+            case '&' => vmWriter.writeArithmetic(Command.AND) 
+            case '|' => vmWriter.writeArithmetic(Command.OR) 
         }
     }
 
@@ -189,18 +200,15 @@ class VisitWriter()  extends ast.Visitor {
 
         if (parts.length == 1) { // metodo da propria classe
                 vmWriter.writePush(Segment.POINTER, 0) // ponteiro this
-                v.arguments.foreach {
-                    exp => exp.accept(this)
-                } 
                 funcName = className + "." + v.name
                 nargs+=1
                 
         } else { // pode ser um metodo de um outro objeto ou uma função
 
-            symbolTable.resolve(parts(0)) match { 
+                symbolTable.resolve(parts(0)) match { 
                 case Some (sym) =>  {
                     // é um metodo de outro objeto
-                    var funcName = sym.typeOf + "." + parts(1)
+                    funcName = sym.typeOf + "." + parts(1)
                     vmWriter.writePush(kindToSegment(sym.kind), sym.index)
                     nargs+=1
                 }
