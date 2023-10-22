@@ -63,10 +63,20 @@ class VisitWriter()  extends ast.Visitor {
 
     def visitLetStatement (v: LetStatement) = {
         v.exp.accept(this)
-        println("pop " +  v.id)
-    }
-    def visitExpression (v: Expression) = {
+        
+        var symOption: Option[Symbol] = None
 
+        v.id match {
+            case Variable(varName) => symOption = symbolTable.resolve(varName)
+            case IndexVariable(varName, _) => symOption = symbolTable.resolve(varName)
+        }    
+        
+        
+
+        symOption match {
+            case Some (sym) => vmWriter.writePop(kindToSegment(sym.kind), sym.index)
+            case None => println ("variavel nao encontrada") // criar uma exceção
+        }
     }
 
     def visitDoStatement (v: DoStatement) = {
@@ -83,6 +93,9 @@ class VisitWriter()  extends ast.Visitor {
         }
         
         
+    }
+    def visitIndexVariable (v: IndexVariable) : Unit = {
+
     }
 
     def visitIntegerLiteral (v: IntegerLiteral) = {
@@ -110,6 +123,7 @@ class VisitWriter()  extends ast.Visitor {
             case '*' => vmWriter.writeCall ("Math.multiply",2)
             case '/' => vmWriter.writeCall ("Math.divide", 2)
             case '+' => vmWriter.writeArithmetic(Command.ADD) 
+            case '-' => vmWriter.writeArithmetic(Command.SUB) 
         }
     }
 

@@ -67,6 +67,31 @@ call Math.multiply 2
       assertEquals(expected, actual)
   }
 
+    @Test
+  def testSimpleExpression3(): Unit = {
+    val input =
+      """10 * 20 * 30
+      """
+
+    
+    val parser = new JackParser(input)
+    val st = parser.parseExpression()
+    var visitor = VisitWriter()
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """push constant 10
+push constant 20
+call Math.multiply 2
+push constant 30
+call Math.multiply 2
+"""
+
+
+      assertEquals(expected, actual)
+  }
+
+
 
   @Test
   def testString(): Unit = {
@@ -343,6 +368,88 @@ return
 """
       assertEquals(expected, actual)
   }
+
+
+  @Test
+  def testLet(): Unit = {
+    val input =
+      """
+            class Main {
+            
+              function void main () {
+                  var int x;
+                  let x = 42;
+                  return;
+              }
+            } 
+      """
+
+    
+    val parser = new JackParser(input)
+    val st = parser.parseClass()
+ 
+    var visitor = VisitWriter()
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """function Main.main 1
+push constant 42
+pop local 0
+push constant 0
+return
+"""
+
+      println ("expected")
+      print (expected)
+      println ("atual")
+      println (actual)
+
+      assertEquals(expected, actual)
+  }
+
+  
+
+  @Test
+  def testLet2(): Unit = {
+    val input =
+      """
+      class Main {
+            
+              function void main () {
+                  var int x;
+                let x = 42+y-4;
+              }
+            }
+      """
+
+    
+    val parser = new JackParser(input)
+    val st = parser.parseClass()
+    println ("tesslet2")
+    print(st)
+   
+    var visitor = VisitWriter()
+    st.accept(visitor)
+   
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """function Main.main 1
+push constant 42
+pop local 0
+push constant 0
+return
+"""
+
+      println ("expected")
+      print (expected)
+      println ("atual")
+      println (actual)
+      
+      //assertEquals(expected, actual)
+      
+  }
+
+
 
 
 

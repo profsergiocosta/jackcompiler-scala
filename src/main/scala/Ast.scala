@@ -24,9 +24,8 @@ abstract class Visitor {
     def visitDoStatement (v: DoStatement) : Unit
 
 
-
-    def visitExpression (v: Expression) : Unit
     def visitVariable (v: Variable) : Unit
+    def visitIndexVariable (v: IndexVariable) : Unit
     def visitIntegerLiteral (v: IntegerLiteral) : Unit
     def visitStringLiteral (v: StringLiteral) : Unit
     def visitKeywordLiteral (v: KeywordLiteral) : Unit
@@ -44,12 +43,7 @@ abstract class Node {
     def accept(v: Visitor) :Unit
 }
 
-abstract class Expression extends Node {
-     def accept (v: Visitor) = {
-        return v.visitExpression(this)
-    }
-}
-
+abstract class Expression extends Node 
 abstract class Statement extends Node
 abstract class Identifier extends Expression
 
@@ -99,7 +93,11 @@ case class Variable (val varName:String) extends Identifier  {
     }
 }
 
-case class IndexVariable (val varName: String, exp: Expression) extends Identifier 
+case class IndexVariable (val varName: String, exp: Expression) extends Identifier  {
+    override def accept (v: Visitor) = {
+        return v.visitIndexVariable(this)
+    }
+}
 case class IntegerLiteral (val value:Int) extends Expression  {
 
     override def accept (v: Visitor) = {
