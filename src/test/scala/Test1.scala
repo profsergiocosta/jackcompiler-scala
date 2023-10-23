@@ -13,10 +13,10 @@ class Test1:
 
     
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
 
     val st = parser.parseExpression()
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
@@ -33,9 +33,9 @@ class Test1:
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseExpression()
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
@@ -54,9 +54,9 @@ add
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseExpression()
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
@@ -74,9 +74,9 @@ call Math.multiply 2
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseExpression()
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
@@ -100,9 +100,9 @@ call Math.multiply 2
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseExpression()
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
@@ -128,9 +128,9 @@ call String.appendChar 2
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseExpression()
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
@@ -147,9 +147,9 @@ call String.appendChar 2
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseExpression()
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
@@ -166,9 +166,9 @@ not
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseExpression()
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
@@ -184,9 +184,9 @@ not
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseExpression()
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
@@ -204,9 +204,9 @@ neg
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseReturnStatement()
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
@@ -224,9 +224,9 @@ return
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseReturnStatement()
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
@@ -252,10 +252,10 @@ return
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseIfStatement()
     //println (st)
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
@@ -284,10 +284,10 @@ label IF_END0
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseStatement()
     //println (st)
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
@@ -322,10 +322,10 @@ label WHILE_END0
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseClass()
  
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
@@ -355,10 +355,10 @@ return
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseClass()
  
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
@@ -385,10 +385,10 @@ return
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseClass()
  
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
     val actual = visitor.vmOutput.toString
     val expected =
@@ -422,10 +422,10 @@ return
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseClass()
 
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
    
     val actual = visitor.vmOutput.toString
@@ -459,10 +459,10 @@ return
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseClass()
 
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
    
     val actual = visitor.vmOutput.toString
@@ -509,11 +509,11 @@ return
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseClass()
     print (st)
 
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
    
     val actual = visitor.vmOutput.toString
@@ -552,11 +552,11 @@ return
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseClass()
 
 
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
    
     val actual = visitor.vmOutput.toString
@@ -589,11 +589,11 @@ return
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseClass()
     print (st)
 
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
    
     val actual = visitor.vmOutput.toString
@@ -644,10 +644,10 @@ return
       """
 
     
-    val parser = new JackParser(input)
+    val parser = new Parser(input)
     val st = parser.parseClass()
 
-    var visitor = VisitWriter()
+    var visitor = CodeGenerator()
     st.accept(visitor)
    
     val actual = visitor.vmOutput.toString

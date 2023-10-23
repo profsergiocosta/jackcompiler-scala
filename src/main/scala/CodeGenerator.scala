@@ -7,7 +7,7 @@ import jackcompiler.ast.*
 
 
 
-class VisitWriter()  extends ast.Visitor {
+class CodeGenerator  extends ast.Visitor {
 
 
     var vmWriter = VMWriter()

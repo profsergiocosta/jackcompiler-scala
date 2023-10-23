@@ -6,9 +6,9 @@ package jackcompiler
 import jackcompiler.ast.* 
 
     
-class JackParser (val source:String) {
+class Parser (val source:String) {
 
-    val jt = new JackTokenizer (source)
+    val jt = new Tokenizer (source)
 
     var currToken : Token = null
     var peekToken : Token = jt.nextToken()

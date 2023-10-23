@@ -7,7 +7,16 @@ import scala.collection.mutable.Stack
 
 
 
-class JackTokenizer (val input:String) {
+abstract class Token
+case class TKeyword(s:String) extends Token
+case class TSymbol (c:Char) extends Token
+case class TIdentifier(s:String) extends Token
+case class TStringConst(s:String) extends Token
+case class TIntConst(i:Int) extends Token
+case class TEOF (t:Char) extends Token
+
+
+class Tokenizer (val input:String) {
 
     val keywords = Set("int","class","constructor","function","method","field","static","var","char","boolean","void","true","false","null","this","let","do","if","else","while","return");
  

@@ -20,9 +20,9 @@ def compileFile (file: File) : Unit = {
       println(s"compiling '$fName'")
       val source = Source.fromFile(file)
       val content = source.getLines().mkString("\n")
-      val parser = JackParser(content)
+      val parser = Parser(content)
       val st = parser.parseClass()
-      var visitor = VisitWriter()
+      var visitor = CodeGenerator()
       st.accept(visitor)
      
       var outputFname = removeFileExtension(fName) + ".vm" 
@@ -55,25 +55,5 @@ def compileFile (file: File) : Unit = {
     println(s"O arquivo $fName não foi encontrado.")
   }
 
-  
-  //val source = scala.io.Source.fromFile("/home/sergio/developing/Main.jack")
-
-
-  
-  val input = "\"ola\""  //(source.getLines mkString "\n")
-/*
-  val parser = JackParser(input)
-  //val st = parser.parseClassVarDec()
-  //val st = parser.parseClass()
-  //val st = parser.parseStatement()
-  val st = parser.parseExpression()
-  //val st = parser.parseExpressionList()
-  //var visitor = new AstPrinter()
-  var visitor = VisitWriter()
-  println(st)
-  st.accept(visitor)
-  println()
-  print (visitor.vmOutput)*/
-  
 
 
