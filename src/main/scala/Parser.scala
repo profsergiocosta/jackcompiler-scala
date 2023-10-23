@@ -185,18 +185,6 @@ class Parser (val source:String) {
 
     }
 
-/*
-    def parseParameterList() : Unit = {
-        if (peekTokenIs(TSymbol(')'))) return
-
-        var t = parseType()
-        expectPeek(TIdentifier(null))
-        if (peekTokenIs(TSymbol(','))) {
-            expectPeek(TSymbol(','))
-            parseParameterList()
-        }
-    }
-*/
 
     def parseListVarDeclaration(kind: Kind.Kind, varType: String) : List[ast.VarDeclaration] = {
       

@@ -4,40 +4,7 @@ import jackcompiler.Token
 import jackcompiler.Kind
 
 
-
-
-abstract class Visitor {
-
-
-    def visitClassDec(v:ClassDec) : Unit
-    def visitSubroutine(v:Subroutine) : Unit
-    
-
-    def visitVarDeclaration(v:VarDeclaration) : Unit
-
-
-    def visitStatements (v: Statements) : Unit
-    def visitLetStatement (v: LetStatement) : Unit
-    def visitIfStatement (v: IfStatement) : Unit
-    def visitWhileStatement (v: WhileStatement) : Unit
-    def visitReturnStatement (v: ReturnStatement) : Unit
-    def visitDoStatement (v: DoStatement) : Unit
-
-
-    def visitVariable (v: Variable) : Unit
-    def visitIndexVariable (v: IndexVariable) : Unit
-    def visitIntegerLiteral (v: IntegerLiteral) : Unit
-    def visitStringLiteral (v: StringLiteral) : Unit
-    def visitKeywordLiteral (v: KeywordLiteral) : Unit
-    def visitBinaryExpression (v: BinaryExpression) : Unit
-    def visitUnaryExpression (v: UnaryExpression) : Unit
-    def visitCall (v: Call) : Unit
-    
-    
-
-    
-    
-}
+// ------------------- Inicio da AST
 
 abstract class Node {
     def accept(v: Visitor) :Unit
@@ -171,3 +138,37 @@ case class DoStatement (val subroutine:Expression) extends Statement{
     }
 }
 
+// ------------------- fim da AST
+
+abstract class Visitor {
+
+
+    def visitClassDec(v:ClassDec) : Unit
+    def visitSubroutine(v:Subroutine) : Unit
+    
+
+    def visitVarDeclaration(v:VarDeclaration) : Unit
+
+
+    def visitStatements (v: Statements) : Unit
+    def visitLetStatement (v: LetStatement) : Unit
+    def visitIfStatement (v: IfStatement) : Unit
+    def visitWhileStatement (v: WhileStatement) : Unit
+    def visitReturnStatement (v: ReturnStatement) : Unit
+    def visitDoStatement (v: DoStatement) : Unit
+
+
+    def visitVariable (v: Variable) : Unit
+    def visitIndexVariable (v: IndexVariable) : Unit
+    def visitIntegerLiteral (v: IntegerLiteral) : Unit
+    def visitStringLiteral (v: StringLiteral) : Unit
+    def visitKeywordLiteral (v: KeywordLiteral) : Unit
+    def visitBinaryExpression (v: BinaryExpression) : Unit
+    def visitUnaryExpression (v: UnaryExpression) : Unit
+    def visitCall (v: Call) : Unit
+    
+    
+
+    
+    
+}
