@@ -97,7 +97,7 @@ case class Call (val name:String, arguments:List[Expression]) extends Expression
 
 }
 
-case class Statements (val sts:List[Statement]) extends Node {
+case class Statements (val sts:List[Statement]) extends Statement {
 
     override def accept (v: Visitor) = {
         return v.visitStatements(this)

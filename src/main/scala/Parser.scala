@@ -42,6 +42,7 @@ class Parser (val source:String) {
 
     def parseStatement () : ast.Statement = {
     
+        
         peekToken match {
             case TKeyword("let") => {
                 return    parseLetStatement()
@@ -63,11 +64,44 @@ class Parser (val source:String) {
                return    parseDoStatement()
             }
 
-
+            case TKeyword("for") => {
+               return  parseForStatement()
+            }
 
         }
 
        
+    }
+
+    def parseSimpleLetStatement () : ast.LetStatement = {
+              
+        val id = parseIdentifier();
+        
+        expectPeek(TSymbol('='));
+        
+        val exp = parseExpression()
+        val st = ast.LetStatement(id, exp)
+
+        
+        return st;
+    }
+
+    def parseForStatement ()  : ast.Statements = {
+    //def parseForStatement ()  : ast.WhileStatement = {
+        expectPeek(TKeyword ("for"))
+        expectPeek(TSymbol ('('))
+        var init = parseSimpleLetStatement() 
+        expectPeek(TSymbol (';'))
+        var cond =  parseExpression()        
+        expectPeek(TSymbol (';'))
+        var update = parseSimpleLetStatement() 
+        expectPeek(TSymbol (')'))
+        expectPeek(TSymbol ('{'))
+        var body = parseStatements() :+ update
+        expectPeek(TSymbol ('}'))
+        var whilest = ast.WhileStatement(cond, ast.Statements(body))        
+        return  ast.Statements(List(init,whilest))
+
     }
 
     def parseDoStatement () : ast.DoStatement = {
@@ -443,7 +477,7 @@ class Parser (val source:String) {
     def isStatement (token :Token) : Boolean = {
         token match {
             case TKeyword ("if")| TKeyword ("let")
-                 |TKeyword ("while") | TKeyword ("do") |TKeyword ("return")
+                 |TKeyword ("while") | TKeyword ("do") |TKeyword ("return") | TKeyword ("for")
                     => return true
             case _ => false
         }

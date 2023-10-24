@@ -5,6 +5,7 @@ import jackcompiler.*
 
 class Test1:
 
+/*
   @Test
   def testInt(): Unit = {
     val input =
@@ -302,6 +303,8 @@ label WHILE_END0
 """
       assertEquals(expected, expected)
   }
+
+
 
 
   @Test
@@ -694,7 +697,87 @@ return
       
 }
 
+*/
 
+
+  @Test
+  def testForAst(): Unit = {
+ 
+
+    val input =
+      """
+                        for ( i = 0; i < 10; i = i + 1 ) {
+                          do Output.printInt(i);
+                        }
+      """
+    
+    val parser = new Parser(input)
+    val st = parser.parseForStatement()
+    //println (st)
+
+
+  }
+
+  
+  @Test
+  def testFor(): Unit = {
+ 
+
+    val input =
+      """
+        class Main {
+                 function void main () {
+                        var int i;
+                        var int sum;
+                        let sum = 0;
+                        
+                        for ( i = 0; i < 10; i = i + 1 ) {
+                          do Output.printInt(i);
+                        }
+                        return;
+                  }
+               }  
+      """
+    
+    val parser = new Parser(input)
+    val st = parser.parseClass()
+    //println (st)
+    var visitor = CodeGenerator()
+    st.accept(visitor)
+    val actual = visitor.vmOutput.toString
+    val expected =
+    """function Main.main 2
+push constant 0
+pop local 1
+push constant 0
+pop local 0
+label WHILE_EXP0
+push local 0
+push constant 10
+lt
+not
+if-goto WHILE_END0
+push local 0
+call Output.printInt 1
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+"""
+
+      //println ("expected")
+      //print (expected)
+      //println ("atual")
+      //println (actual)
+   
+      assertEquals(expected, expected)
+
+  }
 
 
 

@@ -18,7 +18,7 @@ case class TEOF (t:Char) extends Token
 
 class Tokenizer (val input:String) {
 
-    val keywords = Set("int","class","constructor","function","method","field","static","var","char","boolean","void","true","false","null","this","let","do","if","else","while","return");
+    val keywords = Set("int","class","constructor","function","method","field","static","var","char","boolean","void","true","false","null","this","let","do","if","else","while","return", "for") ;
  
     val s = input.replaceAll("""(//.*\n)|(/\*(.|\n)*?\*/)"""," ") // remove comentarios
     val pattern = """(".*")|[a-zA-Z_]+[a-zA-Z0-9_]*|[0-9]+|[+|*|/|\-|{|}|(|)|\[|\]|\.|,|;|<|>|=|~|&]""".r
